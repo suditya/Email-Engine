@@ -1,0 +1,180 @@
+const schedule = require('node-schedule');
+const nodemailer = require('nodemailer');
+
+
+const ScheduledEmails = require('../models/ScheduledEmail')
+const UserEmail = require('../models/UsersEmail')
+const Emails = require('../models/ScheduledEmail')
+const MailAccount = require('../models/MailAccount')
+const List = require('../models/List')
+
+
+
+const ScheduledEmailsController = async (req, res) => {
+    try {
+
+        const token = req.headers['authorization']
+
+        if (token == "null") {
+            throw new Error("You don't have the access")
+        }
+        else {
+            const result = await ScheduledEmails.find({ userId: req.params['userId'] }).sort({
+                meetingDate: -1
+            })
+
+            if (result.length == 0) {
+                throw new Error("No scheduled emails are there")
+            }
+            else {
+                res.send({
+                    status: "SUCCESS",
+                    data: result
+                });
+            }
+        }
+    } catch (error) {
+        res.send({
+            status: "FAILED",
+            message: error.message
+        });
+    }
+}
+
+
+const SendEmailController = async (req, res) => {
+    try {
+
+        let { subject, from, to, description, startTime, endTime, date, reminder, userId } = req.body
+
+        const token = req.headers['authorization']
+        console.log("token", token);
+
+        if (token == "null") {
+            throw new Error("You don't have the access")
+        }
+        else {
+            if (startTime.hours > endTime.hours) {
+                throw new Error("Start time should be less then end time")
+            }
+            else {
+
+                let emailDate = new Date(`${date}T${startTime.hours}:${startTime.minutes}`)
+
+                if (reminder === "Before 1 hour") {
+                    emailDate.setHours(emailDate.getHours());
+                }
+                if (reminder === "Before 6 hour") {
+                    emailDate.setHours(emailDate.getHours() - 6);
+                }
+                if (reminder === "Before 12 hour") {
+                    emailDate.setHours(emailDate.getHours() - 12);
+                }
+                if (reminder === "Before 1 day") {
+                    emailDate.setHours(emailDate.getHours() - 24);
+                }
+                if (reminder === "Immediately") {
+                    emailDate.setHours(emailDate.getHours());
+                }
+
+                if (emailDate.toString() < new Date().toString()) {
+                    throw new Error("Select date and time should be greater then today's date and time")
+                }
+                else {
+                    const response = await MailAccount.find({ email: from, userId })
+
+                    let id = '';
+
+                    id = response[0].userId
+                    password = response[0].password
+
+                    let emailIds = []
+
+                    const result = await List.find({ listName: to, userId: id })
+
+                    if (!result.length) {
+                        throw new Error("There is no email")
+                    }
+                    else {
+                        let id = result[0]._id;
+                        const response = await UserEmail.find({ userId: id })
+
+                        let i = 0;
+                        response.forEach(function (response) {
+                            emailIds[i] = response.email
+                            i++;
+                        })
+                        if (emailIds.length == 0) {
+                            throw new Error(`No email found in ${result.listName} List`)
+                        }
+                        else {
+                            const newScheduledEmails = new ScheduledEmails({
+                                userId: userId,
+                                subject: subject,
+                                from: from,
+                                to: emailIds.toString(),
+                                meetingDate: date,
+                                startTime: `${startTime.hours}:${startTime.minutes}`,
+                                endTime: `${endTime.hours}:${endTime.minutes}`,
+                                ScheduleDate: emailDate,
+                                description: description,
+                            })
+                            await newScheduledEmails.save()
+
+                            const result = await Emails.find()
+
+                            let newTransporter = nodemailer.createTransport({
+                                service: 'gmail',
+                                auth: {
+                                    user: from,
+                                    pass: password
+                                }
+                            })
+
+                            schedule.scheduleJob('* * * * * *', () => {
+
+                                let data = [];
+
+                                result.forEach(function (response) {
+
+                                    data = response.ScheduleDate
+
+                                    if (data === new Date().toString()) {
+
+                                        const mailOptions = {
+                                            from: response.from,
+                                            to: response.to,
+                                            subject: response.subject,
+                                            html: `<h1>${response.description} </h1>`
+                                        };
+
+                                        newTransporter.sendMail(mailOptions)
+
+                                        console.log("sent");
+                                    }
+                                })
+                                console.log("I'll execute every time");
+                            })
+                        }
+                        res.send({
+                            status: "SUCCESS",
+                            message: `Email saved in draft. It will automatically send ${reminder} of the meeting`
+                        })
+                    }
+                }
+            }
+        }
+    } catch (error) {
+        res.send({
+            status: "FAILED",
+            message: error.message,
+        });
+    }
+}
+
+
+
+module.exports = {
+    ScheduledEmailsController,
+    SendEmailController
+}

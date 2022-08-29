@@ -12,7 +12,15 @@ app.use(bodyParser.json())
 app.use(cors())
 
 const UserRouter = require('./api/User');
+const VerificationRouter = require('./api/Verification');
+const AccountRouter = require('./api/Account');
+const ListRouter = require('./api/List');
+const ScheduledEmail = require('./api/ScheduledEmail');
 app.use('/user', UserRouter)
+app.use('/verification', VerificationRouter)
+app.use('/account', AccountRouter)
+app.use('/list', ListRouter)
+app.use('/email', ScheduledEmail)
 
 
 const PORT = process.env.PORT_NUMBER || 3000

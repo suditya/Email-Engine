@@ -3,52 +3,55 @@ const MailAccount = require('../models/MailAccount')
 const UserEmail = require('../models/UsersEmail')
 
 
-
-const UsersEmailsController = async (req, res) => {
-
-    try {
-        // console.log("alllist userId", req.params.listId)
-
-    await UserEmail.find({ userId: req.params['_id'] }).then((result) => {
-        // console.log( req.params['listId'] );
-        console.log("object", result);
-        res.json({
-            status: "SUCCESS",
-            data: result
-        })
-    }).catch((error) => {
-        console.log("error", error);
-        res.json({
-            status: "FAILED",
-            message: error
-        })
-    })
-    } catch (error) {
-        console.log("error", error);
-    }
-
-}
-
 const AllListsController = async (req, res) => {
     try {
-        // console.log("all list userId", req.params);
-        List.find({ userId: req.params['userId'] }).then((data) => {
-            // console.log("result ye he: ", data)
+        const token = req.headers['authorization']
+
+        if (token == "null") {
+            throw new Error("You don't have the access")
+        }
+        else {
+            const data = await List.find({ userId: req.params['userId'] })
+
             if (data.length == 0) {
-                res.json({
-                    message: "No List is there"
-                })
-            } else {
-                res.json({
+                throw new Error("No List is there")
+            }
+            else {
+                res.send({
                     status: "SUCCESS",
                     data: data
                 })
             }
-        })
+        }
     } catch (error) {
-        res.json({
+        res.send({
             status: "FAILED",
-            message: "An error occured while fetching Lists"
+            message: error.message
+        })
+    }
+}
+
+const UsersEmailsController = async (req, res) => {
+
+    try {
+
+        const token = req.headers['authorization']
+
+        if (token == "null") {
+            throw new Error("You don't have the access")
+        }
+        else {
+            const result = await UserEmail.find({ userId: req.params['_id'] })
+
+            res.send({
+                status: "SUCCESS",
+                data: result
+            })
+        }
+    } catch (error) {
+        res.send({
+            status: "FAILED",
+            message: error.message
         })
     }
 }
@@ -58,172 +61,160 @@ const AddUserController = async (req, res) => {
     try {
         let { userId, name, email, listName } = req.body
 
-        List.find({ listName, userId }).then((result) => {
-            let id = result[0]._id
-            console.log("Ye hmaraaaaa he: ", id);
+        const token = req.headers['authorization']
+
+        if (token == "null") {
+            throw new Error("You don't have the access")
+        }
+        else {
+            const result = await List.find({ listName, userId })
+
+            let _id = result[0]._id
 
             if (!result.length) {
-                res.json({
-                    status: "FAILED",
-                    message: "You dont have any list. Please add a list first"
-                })
-            } else {
-                List.find({ listName, userId }).then(() => {
-                    UserEmail.find({ listName, email }).then((result) => {
-                        // console.log("object", result);
-                        if (result.length) {
-                            res.json({
-                                status: "FAILED",
-                                message: `Email is already there in ${listName} list`
-                            })
-                        } else {
-                            const newUserEmail = new UserEmail({
-                                userId: id,
-                                name: name,
-                                email: email,
-                                listName: listName
-                            })
-                            newUserEmail.save().then((result) => {
-                                res.json({
-                                    status: "SUCCESS",
-                                    message: "User email has been added successfully"
-                                })
-                            }).catch((error) => {
-                                res.json({
-                                    status: "FAILED",
-                                    message: "An error occured while adding user email"
-                                })
-                            })
-                        }
-                    })
-                })
+                throw new Error("You dont have any list. Please add a list first")
             }
-        })
+            else {
+                const result = await UserEmail.find({ userId: _id, email })
 
-        // console.log("abcdefghij", req.params['listName']);
+                if (result.length) {
+                    throw new Error(`Email is already there in ${listName} list`)
+                }
+                else {
+                    const newUserEmail = new UserEmail({
+                        userId: _id,
+                        name: name,
+                        email: email,
+                        listName: listName
+                    })
 
+                    await newUserEmail.save();
+
+                    res.send({
+                        status: "SUCCESS",
+                        message: "User email has been added successfully"
+                    })
+                }
+            }
+        }
     } catch (error) {
-        res.json({
+        res.send({
             status: "FAILED",
-            message: "An error occured while adding user email"
+            message: error.message
         })
     }
 }
 
 const AddListController = async (req, res) => {
     try {
-        let { userId, listName } = req.body;
-        // console.log("ejdhbndssdnshsn", userId, listName)
-        // console.log("list Name ", listName);
-        if (listName === "") {
-            res.json({
-                status: "FAILED",
-                message: "List name can not be empty"
-            })
-        } else {
-            MailAccount.find({ userId }).then((result) => {
-                // console.log("ye rhaaaaaaaaaaa result:", result);
-                if (result.length == 0) {
-                    res.json({
-                        status: "FAILED",
-                        message: "OOPS, You don't have any account. Please add an account first"
-                    })
-                } else {
-                    try {
-                        console.log("ejdhbndssdnshsn", userId, listName)
-                        List.find({ userId, listName }).then((result) => {
-                            console.log("resufscffdfdlt is: ", result)
+        let { userId, listName, description } = req.body;
 
-                            if (result.length) {
-                                res.json({
-                                    status: "FAILED",
-                                    message: "List name is already there. Please try with different list name"
-                                })
-                            } else {
-                                try {
-                                    const newList = new List({
-                                        userId: userId,
-                                        listName: listName
-                                    })
-                                    newList.save().then(() => {
-                                        res.json({
-                                            status: "SUCCESS",
-                                            message: "List added successfully."
-                                        })
-                                    }).catch(() => {
-                                        res.json({
-                                            status: "FAILED",
-                                            message: "Something went wrong !!"
-                                        })
-                                    })
-                                } catch (error) {
-                                    res.json({
-                                        status: "FAILED",
-                                        message: "An error occured while adding list"
-                                    })
-                                }
-                            }
+        const token = req.headers['authorization']
 
-                        }).catch((error) => {
-                            res.json({
-                                status: "FAILED",
-                                message: "An error occured while adding list"
-                            })
-                        })
-                    } catch (error) {
-                        res.json({
-                            status: "FAILED",
-                            message: "An error occured while fetching data from all accounts"
-                        })
-                    }
-                }
-            })
-
-
+        if (token == "null") {
+            throw new Error("You don't have the access")
         }
+        else {
+            const result = await MailAccount.find({ userId })
 
+            if (result.length == 0) {
+                throw new Error("OOPS, You don't have any account. Please add an account first")
+            }
+            else {
+                const result = await List.find({ userId, listName })
+
+                if (result.length) {
+                    throw new Error("List name is already there. Please try with different list name")
+                }
+                else {
+                    const newList = new List({
+                        userId: userId,
+                        listName: listName,
+                        description: description
+                    })
+                    await newList.save();
+
+                    res.send({
+                        status: "SUCCESS",
+                        message: "List added successfully."
+                    })
+                }
+            }
+        }
     } catch (error) {
-        res.json({
+        res.send({
             status: "FAILED",
-            message: "An error occured while checking List"
+            message: error.message
         })
     }
 }
 
 const DeleteListController = async (req, res) => {
     try {
-        console.log(req.params['_id']);
-        List.find({ _id: req.params['_id'] }).then((result) => {
-            // console.log("resulttttttt",result.length)
-            // console.log("resulttttttt",result)
+
+        let id = req.params['_id'];
+
+        const token = req.headers['authorization']
+
+        if (token == "null") {
+            throw new Error("You don't have the access")
+        }
+        else {
+            const result = await List.find({ _id: id })
+
             if (!result.length) {
-                res.json({
-                    status: "FAILED",
-                    message: "There is no list with this name"
-                })
-            } else {
-                List.deleteOne({ _id: req.params['_id'] }).then((result) => {
-                    res.json({
-                        status: "SUCCESS",
-                        message: "List has been deleted"
-                    })
-                }).catch((error) => {
-                    res.json({
-                        status: "FAILED",
-                        message: "An error occured while deleting List"
-                    })
+                throw new Error("There is no list with this name")
+            }
+            else {
+
+                await List.deleteOne({ _id: id })
+
+                res.send({
+                    status: "SUCCESS",
+                    message: "List has been deleted"
                 })
             }
-        })
-
-    } catch (error) {
-        res.json({
+        }
+    }
+    catch (error) {
+        res.send({
             status: "FAILED",
-            message: "An error occured while deleting List"
+            message: error.message
         })
     }
 }
 
+const DeleteUserController = async (req, res) => {
+    try {
+        let id = req.params['_id']
+
+        const token = req.headers['authorization']
+
+        if (token == "null") {
+            throw new Error("You don't have the access")
+        }
+        else {
+            const result = await UserEmail.find({ _id: id })
+
+            if (result.length == 0) {
+                throw new Error("There is no member with this email")
+            }
+            else {
+                await UserEmail.deleteOne({ _id: id })
+
+                res.send({
+                    status: "SUCCESS",
+                    message: "Member has been deleted"
+                })
+            }
+        }
+    } catch (error) {
+        res.send({
+            status: "FAILED",
+            message: error.message
+        })
+    }
+}
 
 
 module.exports = {
@@ -232,6 +223,5 @@ module.exports = {
     AddUserController,
     AddListController,
     DeleteListController,
-    
-
+    DeleteUserController
 }

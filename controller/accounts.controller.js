@@ -1,106 +1,106 @@
 const MailAccount = require('../models/MailAccount')
 
+
 const MailAccountsController = async (req, res) => {
     try {
-        console.log(req.params['userId']);
-        MailAccount.find({ userId: req.params['userId']})
-            .then(data => {
-                console.log("ye dddddata h:", data.length)
-                if (data.length == 0) {
-                    res.json({
-                        message: "No account is there"
-                    })
-                } else {
-                    res.json({
-                        status: "SUCCESS",
-                        data: data
-                    })
-                }
-            })
+        let token = req.headers['authorization']
+
+        if (token == "null") {
+            throw new Error("You don't have the access")
+        }
+        else {
+            const data = await MailAccount.find({ userId: req.params['userId'] })
+
+            if (data.length == 0) {
+                throw new Error("No account is there")
+            }
+            else {
+                res.send({
+                    status: "SUCCESS",
+                    data: data
+                })
+            }
+        }
     } catch (error) {
-        res.json({
+        res.send({
             status: "FAILED",
-            message: "An error occured while checking mail accounts"
+            message: error.message
         })
     }
 }
 
 const AddAccountController = async (req, res) => {
     try {
+        const token = req.headers['authorization']
+
         let { companyName, email, password, userId } = req.body;
 
-        userId: userId.trim();
         companyName = companyName.trim();
         email = email.trim();
         password = password.trim();
 
-        MailAccount.find({ email }).then((result) => {
+        if (token == "null") {
+            throw new Error("You don't have the access")
+        }
+        else {
+            console.log("ravindra");
+            const result = await MailAccount.find({ email, userId })
+
             if (result.length) {
-                res.json({
-                    status: "FAILED",
-                    message: "User with this email id is already exist"
-                })
-            } else {
+                throw new Error("User with this email id is already exist")
+            }
+            else {
                 const newAddAccount = new MailAccount({
                     userId: userId,
                     companyName: companyName,
                     email: email,
                     password: password
                 })
-                newAddAccount.save().then((result) => {
-                    res.json({
-                        status: "Success",
-                        message: "Account added successfully"
-                    })
-                }).catch((error) => {
-                    res.json({
-                        status: "FAILED",
-                        message: "An error occured while adding account!"
-                    })
+
+                await newAddAccount.save();
+
+                res.send({
+                    status: "Success",
+                    message: "Account added successfully"
                 })
             }
-        })
-
-
-
+        }
     } catch (error) {
-        res.json({
+        res.send({
             status: "FAILED",
-            message: "User with this email id is already exist"
+            message: error.message
         })
     }
 }
 
 const DeleteAccountController = async (req, res) => {
     try {
-        console.log(req.params['_id']);
-        MailAccount.find({ _id: req.params['_id'] }).then((result) => {
-            // console.log("resulttttttt",result.length)
-            // console.log("resulttttttt",result)
+
+        const token = req.headers['authorization']
+        let id = req.params['_id'];
+
+        if (token == "null") {
+            throw new Error("You don't have the access")
+        }
+        else {
+            const result = await MailAccount.find({ _id: id })
+
             if (!result.length) {
-                res.json({
-                    status: "FAILED",
-                    message: "There is no account with this name"
-                })
-            } else {
-                MailAccount.deleteOne({ _id: req.params['_id'] }).then((result) => {
-                    res.json({
-                        status: "SUCCESS",
-                        message: "Account has been deleted"
-                    })
-                }).catch((error) => {
-                    res.json({
-                        status: "FAILED",
-                        message: "An error occured while deleting account"
-                    })
+                throw new Error("There is no account with this name")
+            }
+            else {
+                await MailAccount.deleteOne({ _id: req.params['_id'] })
+
+                res.send({
+                    status: "SUCCESS",
+                    message: "Account has been deleted"
                 })
             }
-        })
-
+        }
     } catch (error) {
-        res.json({
+        res.send({
             status: "FAILED",
-            message: "An error occured while deleting account"
+            message: error.message
         })
     }
 }
