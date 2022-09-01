@@ -1,5 +1,5 @@
-const { connect } = require( './data/db' );
-connect();
+require('./data/db');
+// connect();
 
 
 const express = require('express')
@@ -16,11 +16,22 @@ const VerificationRouter = require('./api/Verification');
 const AccountRouter = require('./api/Account');
 const ListRouter = require('./api/List');
 const ScheduledEmail = require('./api/ScheduledEmail');
+const Demo = require('./api/Demo')
 app.use('/user', UserRouter)
 app.use('/verification', VerificationRouter)
 app.use('/account', AccountRouter)
 app.use('/list', ListRouter)
 app.use('/email', ScheduledEmail)
+app.use('/demo', Demo)
+
+
+// app.use('/meetings', function(error, req,res,next){
+//     res.status(error.status || 500);
+//     res.send({
+//         message: error.message
+//     })
+// })
+
 
 
 const PORT = process.env.PORT_NUMBER || 3000

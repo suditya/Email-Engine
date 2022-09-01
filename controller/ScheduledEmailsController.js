@@ -62,7 +62,7 @@ const SendEmailController = async (req, res) => {
                 let emailDate = new Date(`${date}T${startTime.hours}:${startTime.minutes}`)
 
                 if (reminder === "Before 1 hour") {
-                    emailDate.setHours(emailDate.getHours());
+                    emailDate.setMinutes(emailDate.getMinutes() + 1);
                 }
                 if (reminder === "Before 6 hour") {
                     emailDate.setHours(emailDate.getHours() - 6);
@@ -72,9 +72,6 @@ const SendEmailController = async (req, res) => {
                 }
                 if (reminder === "Before 1 day") {
                     emailDate.setHours(emailDate.getHours() - 24);
-                }
-                if (reminder === "Immediately") {
-                    emailDate.setHours(emailDate.getHours());
                 }
 
                 if (emailDate.toString() < new Date().toString()) {
@@ -131,35 +128,84 @@ const SendEmailController = async (req, res) => {
                                 }
                             })
 
-                            schedule.scheduleJob('* * * * * *', () => {
+                            console.log("from: ", from);
+                            console.log("to: ", emailIds.toString(),);
+                            console.log("subject: ", subject);
 
-                                let data = [];
+                            if (reminder === "Immediately") {
+                                const mailOptions = {
+                                    from: from,
+                                    to: emailIds.toString(),
+                                    subject: subject,
+                                    html: `<h1>${description} </h1>`
+                                };
 
-                                result.forEach(function (response) {
+                                newTransporter.sendMail(mailOptions)
 
-                                    data = response.ScheduleDate
+                                schedule.scheduleJob('* * * * * *', () => {
 
-                                    if (data === new Date().toString()) {
+                                    let data = [];
 
-                                        const mailOptions = {
-                                            from: response.from,
-                                            to: response.to,
-                                            subject: response.subject,
-                                            html: `<h1>${response.description} </h1>`
-                                        };
+                                    result.forEach(function (response) {
 
-                                        newTransporter.sendMail(mailOptions)
+                                        data = response.ScheduleDate
 
-                                        console.log("sent");
-                                    }
+                                        if (data === new Date().toString()) {
+
+                                            const mailOptions = {
+                                                from: response.from,
+                                                to: response.to,
+                                                subject: response.subject,
+                                                html: `<h1>${response.description} </h1>`
+                                            };
+
+                                            newTransporter.sendMail(mailOptions)
+
+                                            console.log("sent");
+                                        }
+                                    })
+                                    console.log("I'll execute every time");
                                 })
-                                console.log("I'll execute every time");
-                            })
+                                res.send({
+                                    status: "SUCCESS",
+                                    message: "Email sent"
+                                })
+
+                            }
+                            else {
+                                schedule.scheduleJob('* * * * * *', () => {
+
+                                    let data = []
+
+                                    result.forEach(function (response) {
+
+                                        data = response.ScheduleDate
+
+                                        if (data === new Date().toString()) {
+
+                                            const mailOptions = {
+                                                from: response.from,
+                                                to: response.to,
+                                                subject: response.subject,
+                                                html: `<h1>${response.description} </h1>`
+                                            };
+
+                                            newTransporter.sendMail(mailOptions)
+
+                                            console.log("sent");
+                                        }
+                                    })
+                                    console.log("I'll execute every time");
+                                })
+                                res.send({
+                                    status: "SUCCESS",
+                                    message: `Email saved in draft. It will automatically send ${reminder} of the meeting`
+                                })
+                            }
+
+
                         }
-                        res.send({
-                            status: "SUCCESS",
-                            message: `Email saved in draft. It will automatically send ${reminder} of the meeting`
-                        })
+
                     }
                 }
             }
