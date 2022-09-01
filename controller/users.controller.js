@@ -45,8 +45,11 @@ const SigninController = async (req, res) => {
         email = email.trim();
         password = password.trim();
 
+        // console.log("object", email, password);
+
         const data = await User.find({ email })
 
+        console.log("data", data);
         if (data.length == 0) {
             throw new Error("Email i'd doesn't exist. Please Register first")
         }

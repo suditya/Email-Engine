@@ -12,9 +12,7 @@ const app = express();
 
 app.use(bodyParser.json())
 
-if(process.env.NODE_ENV === 'development'){
-    app.use(cors())
-}
+app.use(cors())
 
 app.use(express.static(path.join(process.cwd(), 'public')));
 
@@ -32,8 +30,8 @@ app.use('/email', ScheduledEmail)
 app.use('/demo', Demo)
 
 
-app.use(function(req, res, next){
-    console.log("object: ",  path.join(process.cwd()));
+app.use(function (req, res, next) {
+    console.log("object: ", path.join(process.cwd()));
     res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
 })
 
