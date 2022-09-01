@@ -3,7 +3,9 @@ const mongoose = require('mongoose');
 const {NODE_ENV, DB_USER, DB_PASSWORD, DB_HOST, DB_NAME} = process.env;
 // const DB_NAME = "EmailCommunicationEnginDB"
 
-const connectionStr = NODE_ENV === 'development' ? `mongodb://${DB_HOST}/${DB_NAME}` : `mongodb+srv://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}?retryWrites=true&w=majority`;
+const connectionStr = NODE_ENV === 'development' ? `mongodb://${DB_HOST}/${DB_NAME}` :  `mongodb+srv://emailcommunicationengineadmin:${DB_PASSWORD}@cluster0.namafjz.mongodb.net/?retryWrites=true&w=majority`;
+
+console.log("connectionStr", connectionStr);
 
 mongoose.connect(connectionStr, {
     useNewUrlParser: true,
