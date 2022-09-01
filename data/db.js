@@ -1,15 +1,14 @@
 const mongoose = require('mongoose');
 
-const DB_HOST = "127.0.0.1:27017"
-const DB_NAME = "EmailCommunicationEnginDB"
+const {NODE_ENV, DB_USER, DB_PASSWORD, DB_HOST, DB_NAME} = process.env;
+// const DB_NAME = "EmailCommunicationEnginDB"
 
-const connectionStr = `mongodb://${DB_HOST}/${DB_NAME}`;
+const connectionStr = NODE_ENV === 'development' ? `mongodb://${DB_HOST}/${DB_NAME}` : `mongodb+srv://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}?retryWrites=true&w=majority`;
 
 mongoose.connect(connectionStr, {
     useNewUrlParser: true,
 });
 
-const connection = mongoose.connection;
 
 mongoose.connection.on('error', error => {
     console.error(`could not connect to database ${DB_NAME}, error = `, error.message)

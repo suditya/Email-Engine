@@ -1,6 +1,6 @@
 const { execSync } = require('child_process');
 
-const DB_NAME = 'EmailCommunicationEnginDB';
+const {DB_NAME} = process.env;
 
 try {
     execSync(`mongoimport --db ${DB_NAME} --collection meetings --drop --file "${process.cwd()}/data/seed/meetings.json" --jsonArray`);

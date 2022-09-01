@@ -1,3 +1,4 @@
+require('dotenv').config();
 require('./data/db');
 // connect();
 
@@ -5,11 +6,17 @@ require('./data/db');
 const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors');
+const path = require('path')
 
 const app = express();
 
 app.use(bodyParser.json())
-app.use(cors())
+
+if(process.env.NODE_ENV === 'development'){
+    app.use(cors())
+}
+
+app.use(express.static(path.join(process.cwd(), 'public')));
 
 const UserRouter = require('./api/User');
 const VerificationRouter = require('./api/Verification');
@@ -25,14 +32,9 @@ app.use('/email', ScheduledEmail)
 app.use('/demo', Demo)
 
 
-// app.use('/meetings', function(error, req,res,next){
-//     res.status(error.status || 500);
-//     res.send({
-//         message: error.message
-//     })
-// })
-
-
+app.use(function(req, res, next){
+    res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
+})
 
 const PORT = process.env.PORT_NUMBER || 3000
 
