@@ -32,10 +32,10 @@ app.use('/email', ScheduledEmail)
 app.use('/demo', Demo)
 
 
-// app.use(function(req, res, next){
-//     console.log("object: ",  path.join(process.cwd()));
-//     res.sendFile(path.join(process.cwd(), 'public/dist', 'index.html'));
-// })
+app.use(function(req, res, next){
+    console.log("object: ",  path.join(process.cwd()));
+    res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
+})
 
 const PORT = process.env.PORT || 3000
 
