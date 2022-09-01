@@ -36,7 +36,7 @@ app.use(function(req, res, next){
     res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
 })
 
-const PORT = process.env.PORT_NUMBER || 3000
+const PORT = process.env.PORT || 3000
 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
