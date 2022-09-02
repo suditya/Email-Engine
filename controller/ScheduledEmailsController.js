@@ -41,6 +41,24 @@ const ScheduledEmailsController = async (req, res) => {
     }
 }
 
+const DeleteMeetingController = async (req,res) => {
+    try {
+        let userId = req.params['userId']
+        // console.log("object", req.params['userId']);
+        const result = await ScheduledEmails.deleteOne({ _id: userId })
+        // console.log("Result",result);
+        res.send({
+            status: "SUCCESS",
+            message: "Meeting has been deleted"
+        })
+    } catch (error) {
+        res.send({
+            status: "FAILED",
+            message: error.message
+        })
+    }
+}
+
 
 const SendEmailController = async (req, res) => {
     try {
@@ -222,5 +240,6 @@ const SendEmailController = async (req, res) => {
 
 module.exports = {
     ScheduledEmailsController,
+    DeleteMeetingController,
     SendEmailController
 }
