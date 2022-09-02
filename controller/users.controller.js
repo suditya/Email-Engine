@@ -12,6 +12,8 @@ const SignupController = async (req, res) => {
         email = email.trim();
         password = password.trim();
 
+        console.log(name,email,password);
+
         const result = await User.find({ email })
 
         if (result.length) {
