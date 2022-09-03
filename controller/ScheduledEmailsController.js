@@ -44,9 +44,7 @@ const ScheduledEmailsController = async (req, res) => {
 const DeleteMeetingController = async (req,res) => {
     try {
         let userId = req.params['userId']
-        // console.log("object", req.params['userId']);
-        const result = await ScheduledEmails.deleteOne({ _id: userId })
-        // console.log("Result",result);
+        await ScheduledEmails.deleteOne({ _id: userId })
         res.send({
             status: "SUCCESS",
             message: "Meeting has been deleted"
@@ -66,7 +64,6 @@ const SendEmailController = async (req, res) => {
         let { subject, from, to, description, startTime, endTime, date, reminder, userId } = req.body
 
         const token = req.headers['authorization']
-        console.log("token", token);
 
         if (token == "null") {
             throw new Error("You don't have the access")
@@ -80,7 +77,7 @@ const SendEmailController = async (req, res) => {
                 let emailDate = new Date(`${date}T${startTime.hours}:${startTime.minutes}`)
 
                 if (reminder === "Before 1 hour") {
-                    emailDate.setMinutes(emailDate.getMinutes() + 1);
+                    emailDate.setHours(emailDate.getHours() - 1);
                 }
                 if (reminder === "Before 6 hour") {
                     emailDate.setHours(emailDate.getHours() - 6);
@@ -146,16 +143,14 @@ const SendEmailController = async (req, res) => {
                                 }
                             })
 
-                            console.log("from: ", from);
-                            console.log("to: ", emailIds.toString(),);
-                            console.log("subject: ", subject);
-
                             if (reminder === "Immediately") {
                                 const mailOptions = {
                                     from: from,
                                     to: emailIds.toString(),
                                     subject: subject,
-                                    html: `<h1>${description} </h1>`
+                                    html: `<p>${description} </p>
+                                    <h4>Date: ${date}</h4>
+                                    <h4> Time: ${startTime.hours}:${startTime.minutes}-${endTime.hours}:${endTime.minutes}</h4>`
                                 };
 
                                 newTransporter.sendMail(mailOptions)
@@ -179,10 +174,10 @@ const SendEmailController = async (req, res) => {
 
                                             newTransporter.sendMail(mailOptions)
 
-                                            console.log("sent");
+                                            // console.log("sent");
                                         }
                                     })
-                                    console.log("I'll execute every time");
+                                    // console.log("I'll execute every time");
                                 })
                                 res.send({
                                     status: "SUCCESS",
@@ -210,10 +205,10 @@ const SendEmailController = async (req, res) => {
 
                                             newTransporter.sendMail(mailOptions)
 
-                                            console.log("sent");
+                                            // console.log("sent");
                                         }
                                     })
-                                    console.log("I'll execute every time");
+                                    // console.log("I'll execute every time");
                                 })
                                 res.send({
                                     status: "SUCCESS",

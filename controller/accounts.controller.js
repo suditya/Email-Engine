@@ -43,7 +43,6 @@ const AddAccountController = async (req, res) => {
             throw new Error("You don't have the access")
         }
         else {
-            console.log("ravindra");
             const result = await MailAccount.find({ email, userId })
 
             if (result.length) {

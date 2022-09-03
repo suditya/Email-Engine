@@ -22,7 +22,6 @@ let transporter = nodemailer.createTransport({
 const SendOTPVerificationEmail = async ({ _id, email }, res) => {
     try {
 
-        console.log(transporter.auth);
         const otp = `${Math.floor(1000 + Math.random() * 9000)}`;
 
         const mailOptions = {

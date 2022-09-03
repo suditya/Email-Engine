@@ -153,7 +153,6 @@ const DeleteListController = async (req, res) => {
     try {
 
         let id = req.params['_id'];
-        console.log("object", id);
 
         const token = req.headers['authorization']
 
@@ -170,7 +169,6 @@ const DeleteListController = async (req, res) => {
 
                 await List.deleteOne({ _id: id })
                 const result = await UserEmail.find({ userId: id })
-                console.log("object", result);
                 await UserEmail.deleteMany({ userId: id });
                 res.send({
                     status: "SUCCESS",

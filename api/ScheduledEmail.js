@@ -6,12 +6,10 @@ const { ScheduledEmailsController, SendEmailController, DeleteMeetingController 
 
 
 router.get('/ScheduledEmails/:userId', (req, res) => {
-    // console.log("userId: ", req.params['userId']);
     ScheduledEmailsController(req, res)
 })
 
 router.get('/DeleteMeeting/:userId', (req, res) => {
-    // console.log("userId: ", req.params['userId']);
     DeleteMeetingController(req, res)
 })
 

@@ -21,17 +21,14 @@ const VerificationRouter = require('./api/Verification');
 const AccountRouter = require('./api/Account');
 const ListRouter = require('./api/List');
 const ScheduledEmail = require('./api/ScheduledEmail');
-const Demo = require('./api/Demo')
 app.use('/api/user', UserRouter)
 app.use('/api/verification', VerificationRouter)
 app.use('/api/account', AccountRouter)
 app.use('/api/list', ListRouter)
 app.use('/api/email', ScheduledEmail)
-app.use('/api/demo', Demo)
 
 
 app.use(function (req, res, next) {
-    // console.log("object: ", path.join(process.cwd()));
     res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
 })
 
