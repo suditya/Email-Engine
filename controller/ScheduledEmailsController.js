@@ -88,23 +88,24 @@ const SendEmailController = async (req, res) => {
                 if (reminder === "Before 1 day") {
                     emailDate.setHours(emailDate.getHours() - 24);
                 }
+                console.log(emailDate.toString());
+                console.log(new Date().toString());
 
                 if (emailDate.toString() < new Date().toString()) {
+                   
                     throw new Error("Select date and time should be greater then today's date and time")
                 }
                 else {
                     const response = await MailAccount.find({ email: from, userId })
 
-                    let id = '';
-
-                    id = response[0].userId
-                    password = response[0].password
+                    let id = response[0].userId
+                    let password = response[0].password
 
                     let emailIds = []
 
                     const result = await List.find({ listName: to, userId: id })
 
-                    console.log(result);
+                    // console.log(result);
 
                     if (!result.length) {
                         throw new Error("There is no email")
@@ -118,7 +119,7 @@ const SendEmailController = async (req, res) => {
                             emailIds[i] = response.email
                             i++;
                         })
-                        console.log("ye bhi result h",result);
+                        // console.log("ye bhi result h",result);
                         if (emailIds.length == 0) {
                             throw new Error(`No email found in ${result[0].listName} List`)
                         }
