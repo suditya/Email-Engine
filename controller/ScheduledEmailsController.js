@@ -104,6 +104,8 @@ const SendEmailController = async (req, res) => {
 
                     const result = await List.find({ listName: to, userId: id })
 
+                    console.log(result);
+
                     if (!result.length) {
                         throw new Error("There is no email")
                     }
@@ -116,8 +118,9 @@ const SendEmailController = async (req, res) => {
                             emailIds[i] = response.email
                             i++;
                         })
+                        console.log("ye bhi result h",result);
                         if (emailIds.length == 0) {
-                            throw new Error(`No email found in ${result.listName} List`)
+                            throw new Error(`No email found in ${result[0].listName} List`)
                         }
                         else {
                             const newScheduledEmails = new ScheduledEmails({
