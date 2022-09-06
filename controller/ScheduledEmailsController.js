@@ -113,11 +113,17 @@ const SendEmailController = async (req, res) => {
 
                 console.log(emailDate);
 
+
+                console.log(emailDate);
+
                 if (emailDate.toString() < new Date().toString()) {
 
                     throw new Error("Select date and time should be greater then today's date and time")
                 }
                 else {
+
+                    emailDate = emailDate.toISOString();
+
                     const response = await MailAccount.find({ email: from, userId })
 
                     let id = response[0].userId
@@ -165,7 +171,7 @@ const SendEmailController = async (req, res) => {
                                     meetingDate: date,
                                     startTime: `${startTime.hours}:${startTime.minutes}`,
                                     endTime: `${endTime.hours}:${endTime.minutes}`,
-                                    ScheduleDate: emailDate.toISOString(),
+                                    ScheduleDate: emailDate,
                                     description: description,
                                     sent: true,
                                 })
@@ -228,7 +234,7 @@ const SendEmailController = async (req, res) => {
                                     meetingDate: date,
                                     startTime: `${startTime.hours}:${startTime.minutes}`,
                                     endTime: `${endTime.hours}:${endTime.minutes}`,
-                                    ScheduleDate: emailDate.toISOString().slice(0,-5),
+                                    ScheduleDate: emailDate,
                                     description: description,
                                     sent: false,
                                 })
@@ -247,14 +253,14 @@ const SendEmailController = async (req, res) => {
 
                                         data = response.ScheduleDate
 
-                                        console.log(new Date(data).toISOString().slice(0,-5));
-                                        console.log(new Date().toISOString().slice(0,-5));
+                                        console.log(new Date(data).toISOString().slice(0, -5));
+                                        console.log(new Date().toISOString().slice(0, -5));
 
                                         // console.log(data);
                                         // console.log(new Date().toISOString());
                                         console.log("");
 
-                                        if (new Date(data).toISOString().slice(0,-5) === new Date().toISOString().slice(0,-5)) {
+                                        if (new Date(data).toISOString().slice(0, -5) === new Date().toISOString().slice(0, -5)) {
 
                                             id = response._id
 
