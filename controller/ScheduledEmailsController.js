@@ -228,7 +228,7 @@ const SendEmailController = async (req, res) => {
                                     meetingDate: date,
                                     startTime: `${startTime.hours}:${startTime.minutes}`,
                                     endTime: `${endTime.hours}:${endTime.minutes}`,
-                                    ScheduleDate: emailDate,
+                                    ScheduleDate: emailDate.toISOString().slice(0,-5),
                                     description: description,
                                     sent: false,
                                 })
