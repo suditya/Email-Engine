@@ -247,14 +247,14 @@ const SendEmailController = async (req, res) => {
 
                                         data = response.ScheduleDate
 
-                                        console.log(new Date(data).slice(0,-5));
+                                        console.log(new Date(data).toISOString().slice(0,-5));
                                         console.log(new Date().toISOString().slice(0,-5));
 
                                         // console.log(data);
                                         // console.log(new Date().toISOString());
                                         console.log("");
 
-                                        if (new Date(data).slice(0,-5) === new Date().toISOString().slice(0,-5)) {
+                                        if (new Date(data).toISOString().slice(0,-5) === new Date().toISOString().slice(0,-5)) {
 
                                             id = response._id
 
