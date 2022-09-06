@@ -168,7 +168,7 @@ const DeleteListController = async (req, res) => {
             else {
 
                 await List.deleteOne({ _id: id })
-                const result = await UserEmail.find({ userId: id })
+                await UserEmail.find({ userId: id })
                 await UserEmail.deleteMany({ userId: id });
                 res.send({
                     status: "SUCCESS",
