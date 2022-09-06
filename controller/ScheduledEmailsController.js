@@ -166,6 +166,10 @@ const SendEmailController = async (req, res) => {
                                     result.forEach(function (response) {
 
                                         data = response.ScheduleDate
+                                        
+                                        console.log(data);
+                                        console.log(new Date().toString());
+                                        console.log("");
 
                                         if (data === new Date().toString()) {
 
