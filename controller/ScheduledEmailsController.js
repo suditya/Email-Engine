@@ -65,7 +65,10 @@ const SendEmailController = async (req, res) => {
 
 
         let textArray = description.split(/^/gm)
-        // console.log(textArray)
+
+        // ^ - asserts position at start of a line
+        // g - modifier: global. All matches (don't return after first match)
+        // m - modifier: multi line. Causes ^ and $ to match the begin/end of each line (not only begin/end of string)
 
 
         let descriptionPara = "";
@@ -76,10 +79,8 @@ const SendEmailController = async (req, res) => {
             descriptionPara += newPara
         })
 
-        // console.log(descriptionPara)
-
         function deleteLast2chars(sentence) {
-            return sentence.slice(0, -2);
+            return sentence.slice(0, -1);
         }
 
         const token = req.headers['authorization']
