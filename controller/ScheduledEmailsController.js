@@ -192,10 +192,6 @@ const SendEmailController = async (req, res) => {
                                     scheduledEmail.forEach(async function (response) {
 
                                         data = response.ScheduleDate
-                                        
-                                        console.log(data);
-                                        console.log(new Date().toString());
-                                        console.log("");
 
                                         if (data === new Date().toString()) {
 
@@ -250,17 +246,13 @@ const SendEmailController = async (req, res) => {
 
 
                                         data = response.ScheduleDate
-                                        
-                                        console.log(data);
-                                        console.log(new Date().toString());
-                                        console.log("");
 
-                                        // console.log(new Date(data).toISOString().slice(0,-5));
-                                        // console.log(new Date().toISOString().slice(0,-5));
+                                        console.log(new Date(data).toISOString().slice(0,-5));
+                                        console.log(new Date().toISOString().slice(0,-5));
 
                                         // console.log(data);
                                         // console.log(new Date().toISOString());
-                                        // console.log("");
+                                        console.log("");
 
                                         if (new Date(data).toISOString().slice(0,-5) === new Date().toISOString().slice(0,-5)) {
 
@@ -275,7 +267,7 @@ const SendEmailController = async (req, res) => {
                                                 <h4> Time: ${startTime.hours}:${startTime.minutes}-${endTime.hours}:${endTime.minutes}</h4>`
                                             };
 
-                                            console.log("object");
+                                            // console.log("object");
                                             await newTransporter.sendMail(mailOptions)
                                             await Emails.updateOne({ _id: id }, { sent: true })
 
