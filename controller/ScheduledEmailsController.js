@@ -77,7 +77,7 @@ const SendEmailController = async (req, res) => {
                 let emailDate = new Date(`${date}T${startTime.hours}:${startTime.minutes}`)
 
                 if (reminder === "Before 1 hour") {
-                    emailDate.setHours(emailDate.getHours() - 1);
+                    emailDate.setMinutes(emailDate.getMinutes() + 1);
                 }
                 if (reminder === "Before 6 hour") {
                     emailDate.setHours(emailDate.getHours() - 6);
