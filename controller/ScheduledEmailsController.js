@@ -192,6 +192,10 @@ const SendEmailController = async (req, res) => {
                                     scheduledEmail.forEach(async function (response) {
 
                                         data = response.ScheduleDate
+                                        
+                                        console.log(data);
+                                        console.log(new Date().toString());
+                                        console.log("");
 
                                         if (data === new Date().toString()) {
 
@@ -246,6 +250,10 @@ const SendEmailController = async (req, res) => {
 
 
                                         data = response.ScheduleDate
+                                        
+                                        console.log(data);
+                                        console.log(new Date().toString());
+                                        console.log("");
 
                                         // console.log(new Date(data).toISOString().slice(0,-5));
                                         // console.log(new Date().toISOString().slice(0,-5));
