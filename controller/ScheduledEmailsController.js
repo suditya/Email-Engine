@@ -226,6 +226,7 @@ const SendEmailController = async (req, res) => {
                             }
                             else {
 
+                                console.log(emailDate);
                                 const newScheduledEmails = new ScheduledEmails({
                                     userId: userId,
                                     subject: subject,
