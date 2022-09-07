@@ -117,11 +117,6 @@ const SendEmailController = async (req, res) => {
                     emailDate.setHours(emailDate.getHours() - 24);
                 }
 
-                // console.log(emailDate);
-
-
-                // console.log(emailDate);
-
                 if (emailDate.toString() < new Date().toString()) {
                     console.log(emailDate);
 
@@ -179,7 +174,7 @@ const SendEmailController = async (req, res) => {
                                     meetingDate: date,
                                     startTime: `${startTime.hours}:${startTime.minutes}`,
                                     endTime: `${endTime.hours}:${endTime.minutes}`,
-                                    ScheduleDate: emailDate,
+                                    ScheduleDate: emailDate.toISOString(),
                                     description: description,
                                     sent: true,
                                 })
@@ -243,7 +238,7 @@ const SendEmailController = async (req, res) => {
                                     meetingDate: date,
                                     startTime: `${startTime.hours}:${startTime.minutes}`,
                                     endTime: `${endTime.hours}:${endTime.minutes}`,
-                                    ScheduleDate: emailDate,
+                                    ScheduleDate: emailDate.toISOString(),
                                     description: description,
                                     sent: false,
                                 })
@@ -262,7 +257,7 @@ const SendEmailController = async (req, res) => {
 
                                         data = response.ScheduleDate
 
-                                        console.log(data.slice(0, -5));
+                                        console.log(new Date(data).slice(0, -5));
                                         console.log(new Date().toISOString().slice(0, -5));
 
                                         // console.log(data);
