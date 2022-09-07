@@ -197,7 +197,7 @@ const SendEmailController = async (req, res) => {
 
                                 newTransporter.sendMail(mailOptions)
 
-                                await checkEmailEverySecond(descriptionPara,date,startTime,endTime);
+                                await checkEmailEverySecond(descriptionPara,date,from,password,startTime,endTime);
 
                                 res.send({
                                     status: "SUCCESS",
@@ -221,7 +221,7 @@ const SendEmailController = async (req, res) => {
                                 })
                                 await newScheduledEmails.save()
 
-                                await checkEmailEverySecond(descriptionPara,date,startTime,endTime);
+                                await checkEmailEverySecond(descriptionPara,date,from,password,startTime,endTime);
 
                                 res.send({
                                     status: "SUCCESS",
@@ -242,7 +242,15 @@ const SendEmailController = async (req, res) => {
 }
 
 
-async function checkEmailEverySecond(descriptionPara,date,startTime,endTime) {
+async function checkEmailEverySecond(descriptionPara,date,from,password,startTime,endTime) {
+
+    let newTransporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: from,
+            pass: password
+        }
+    })
 
     let scheduledEmail = await Emails.find()
 
