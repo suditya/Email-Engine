@@ -84,6 +84,8 @@ const SendEmailController = async (req, res) => {
             return sentence.slice(0, -1);
         }
 
+        // console.log("new Date",new Date());
+
         const token = req.headers['authorization']
 
         if (token == "null") {
@@ -96,7 +98,11 @@ const SendEmailController = async (req, res) => {
             else {
 
                 let emailDate = new Date(`${date}T${startTime.hours}:${startTime.minutes}`)
-                // console.log(emailDate);
+
+                emailDate.setHours(emailDate.getHours()-5);
+                emailDate.setMinutes(emailDate.getMinutes()-30);
+
+                console.log("email",emailDate);
 
                 if (reminder === "Before 1 hour") {
                     emailDate.setMinutes(emailDate.getMinutes() + 1);
@@ -111,10 +117,10 @@ const SendEmailController = async (req, res) => {
                     emailDate.setHours(emailDate.getHours() - 24);
                 }
 
-                // console.log(emailDate);
+                console.log(emailDate);
 
 
-                // console.log(emailDate);
+                console.log(emailDate);
 
                 if (emailDate.toString() < new Date().toString()) {
                     console.log(emailDate);
