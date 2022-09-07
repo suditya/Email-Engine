@@ -88,7 +88,7 @@ const SendEmailController = async (req, res) => {
 
         console.log("descriptionPara", descriptionPara);
 
-        console.log("new Date",new Date());
+        console.log("new Date", new Date());
 
         const token = req.headers['authorization']
 
@@ -102,6 +102,12 @@ const SendEmailController = async (req, res) => {
             else {
 
                 let emailDate = new Date(`${date}T${startTime.hours}:${startTime.minutes}`)
+
+
+                if (emailDate.toString() < new Date().toString()) {
+                    // console.log(emailDate);
+                    throw new Error("Select date and time should be greater then today's date and time")
+                }
 
                 emailDate.setHours(emailDate.getHours() - 5);
                 emailDate.setMinutes(emailDate.getMinutes() - 30);
@@ -121,10 +127,6 @@ const SendEmailController = async (req, res) => {
                     emailDate.setHours(emailDate.getHours() - 24);
                 }
 
-                if (emailDate.toString() < new Date().toString()) {
-                    // console.log(emailDate);
-                    throw new Error("Select date and time should be greater then today's date and time")
-                }
                 else {
 
                     // console.log("newEmailDate",newEmailDate);
@@ -195,7 +197,7 @@ const SendEmailController = async (req, res) => {
 
                                 newTransporter.sendMail(mailOptions)
 
-                                await sendEmail(startTime, endTime,date, from, password);
+                                await sendEmailImmediate(startTime, endTime, date, newTransporter);
 
                                 res.send({
                                     status: "SUCCESS",
@@ -287,6 +289,57 @@ async function sendEmail(startTime, endTime, date, from, password) {
             }
         })
         console.log("I'll execute every time");
+    })
+}
+
+async function sendEmailImmediate(startTime, endTime, date, newTransporter) {
+
+    // let newTransporter = nodemailer.createTransport({
+    //     service: 'gmail',
+    //     auth: {
+    //         user: from,
+    //         pass: password
+    //     }
+    // })
+
+    let scheduledEmail = await Emails.find()
+
+    let id = "";
+
+    schedule.scheduleJob('* * * * * *', () => {
+
+        let data = []
+
+        scheduledEmail.forEach(async function (response) {
+
+
+            data = response.ScheduleDate
+
+            console.log(new Date(data).toISOString().slice(0, -5));
+            console.log(new Date().toISOString().slice(0, -5));
+
+            console.log("");
+
+            if (new Date(data).toISOString().slice(0, -5) === new Date().toISOString().slice(0, -5)) {
+
+                id = response._id
+
+                const mailOptions = {
+                    from: response.from,
+                    to: response.to,
+                    subject: response.subject,
+                    html: `${descriptionPara} 
+                        <h4>Date: ${date}</h4>
+                        <h4> Time: ${startTime.hours}:${startTime.minutes}-${endTime.hours}:${endTime.minutes}</h4>`
+                };
+
+                await newTransporter.sendMail(mailOptions)
+                await Emails.updateOne({ _id: id }, { sent: true })
+
+                console.log("sent");
+            }
+        })
+        // console.log("I'll execute every time");
     })
 }
 
