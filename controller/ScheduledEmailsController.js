@@ -96,7 +96,7 @@ const SendEmailController = async (req, res) => {
             else {
 
                 let emailDate = new Date(`${date}T${startTime.hours}:${startTime.minutes}`)
-                console.log(emailDate);
+                // console.log(emailDate);
 
                 if (reminder === "Before 1 hour") {
                     emailDate.setMinutes(emailDate.getMinutes() + 1);
@@ -124,7 +124,7 @@ const SendEmailController = async (req, res) => {
                 }
                 else {
 
-                    emailDate = emailDate.toISOString();
+                    emailDate = new Date(emailDate).toISOString();
 
                     // console.log("emailDate",emailDate);
 
@@ -137,7 +137,7 @@ const SendEmailController = async (req, res) => {
 
                     const result = await List.find({ listName: to, userId: id })
 
-                    // console.log(result);
+                    console.log(result);
 
                     if (!result.length) {
                         throw new Error("There is no email")
@@ -165,70 +165,70 @@ const SendEmailController = async (req, res) => {
                                 }
                             })
 
-                            // console.log("object ", emailDate );
-                            // if (reminder === "Immediately") {
-                            //     const newScheduledEmails = new ScheduledEmails({
-                            //         userId: userId,
-                            //         subject: subject,
-                            //         from: from,
-                            //         to: emailIds.toString(),
-                            //         meetingDate: date,
-                            //         startTime: `${startTime.hours}:${startTime.minutes}`,
-                            //         endTime: `${endTime.hours}:${endTime.minutes}`,
-                            //         ScheduleDate: emailDate,
-                            //         description: description,
-                            //         sent: true,
-                            //     })
-                            //     await newScheduledEmails.save()
+                            console.log("object ", emailDate );
+                            if (reminder === "Immediately") {
+                                const newScheduledEmails = new ScheduledEmails({
+                                    userId: userId,
+                                    subject: subject,
+                                    from: from,
+                                    to: emailIds.toString(),
+                                    meetingDate: date,
+                                    startTime: `${startTime.hours}:${startTime.minutes}`,
+                                    endTime: `${endTime.hours}:${endTime.minutes}`,
+                                    ScheduleDate: emailDate,
+                                    description: description,
+                                    sent: true,
+                                })
+                                await newScheduledEmails.save()
 
-                            //     let scheduledEmail = await Emails.find()
+                                let scheduledEmail = await Emails.find()
 
-                            //     const mailOptions = {
-                            //         from: from,
-                            //         to: emailIds.toString(),
-                            //         subject: subject,
-                            //         html: `${descriptionPara}
-                            //         <h4>Date: ${date}</h4>
-                            //         <h4> Time: ${startTime.hours}:${startTime.minutes}-${endTime.hours}:${endTime.minutes}</h4>`
-                            //     };
+                                const mailOptions = {
+                                    from: from,
+                                    to: emailIds.toString(),
+                                    subject: subject,
+                                    html: `${descriptionPara}
+                                    <h4>Date: ${date}</h4>
+                                    <h4> Time: ${startTime.hours}:${startTime.minutes}-${endTime.hours}:${endTime.minutes}</h4>`
+                                };
 
-                            //     newTransporter.sendMail(mailOptions)
+                                newTransporter.sendMail(mailOptions)
 
 
-                            //     schedule.scheduleJob('* * * * * *', () => {
+                                schedule.scheduleJob('* * * * * *', () => {
 
-                            //         let data = [];
+                                    let data = [];
 
-                            //         scheduledEmail.forEach(async function (response) {
+                                    scheduledEmail.forEach(async function (response) {
 
-                            //             data = response.ScheduleDate
+                                        data = response.ScheduleDate
 
-                            //             if (data === new Date().toString()) {
+                                        if (data === new Date().toString()) {
 
-                            //                 const mailOptions = {
-                            //                     from: from,
-                            //                     to: response.to,
-                            //                     subject: subject,
-                            //                     html: `${descriptionPara}
-                            //                     <h4>Date: ${date}</h4>
-                            //                     <h4> Time: ${startTime.hours}:${startTime.minutes}-${endTime.hours}:${endTime.minutes}</h4>`
+                                            const mailOptions = {
+                                                from: from,
+                                                to: response.to,
+                                                subject: subject,
+                                                html: `${descriptionPara}
+                                                <h4>Date: ${date}</h4>
+                                                <h4> Time: ${startTime.hours}:${startTime.minutes}-${endTime.hours}:${endTime.minutes}</h4>`
 
-                            //                 };
+                                            };
 
-                            //                 await newTransporter.sendMail(mailOptions)
+                                            await newTransporter.sendMail(mailOptions)
 
-                            //                 // console.log("sent");
-                            //             }
-                            //         })
-                            //         // console.log("I'll execute every time");
-                            //     })
-                            //     res.send({
-                            //         status: "SUCCESS",
-                            //         message: "Email sent"
-                            //     })
+                                            // console.log("sent");
+                                        }
+                                    })
+                                    // console.log("I'll execute every time");
+                                })
+                                res.send({
+                                    status: "SUCCESS",
+                                    message: "Email sent"
+                                })
 
-                            // }
-                            // else 
+                            }
+                            else 
                             {
 
                                 const newScheduledEmails = new ScheduledEmails({
