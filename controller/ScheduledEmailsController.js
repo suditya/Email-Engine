@@ -124,9 +124,9 @@ const SendEmailController = async (req, res) => {
                 }
                 else {
 
-                    emailDate = new Date(emailDate).toISOString();
+                    let newEmailDate = new Date(emailDate).toISOString();
 
-                    // console.log("emailDate",emailDate);
+                    // console.log("newEmailDate",newEmailDate);
 
                     const response = await MailAccount.find({ email: from, userId })
 
@@ -175,7 +175,7 @@ const SendEmailController = async (req, res) => {
                                     meetingDate: date,
                                     startTime: `${startTime.hours}:${startTime.minutes}`,
                                     endTime: `${endTime.hours}:${endTime.minutes}`,
-                                    ScheduleDate: emailDate,
+                                    ScheduleDate: newEmailDate,
                                     description: description,
                                     sent: true,
                                 })
@@ -239,7 +239,7 @@ const SendEmailController = async (req, res) => {
                                     meetingDate: date,
                                     startTime: `${startTime.hours}:${startTime.minutes}`,
                                     endTime: `${endTime.hours}:${endTime.minutes}`,
-                                    ScheduleDate: emailDate,
+                                    ScheduleDate: newEmailDate,
                                     description: description,
                                     sent: false,
                                 })
@@ -259,7 +259,7 @@ const SendEmailController = async (req, res) => {
                                         data = response.ScheduleDate
 
                                         console.log(data.slice(0, -5));
-                                        console.log(new Date().toISOString().slice(0, -5));
+                                        console.log(new Date().toString().slice(0, -5));
 
                                         // console.log(data);
                                         // console.log(new Date().toISOString());
