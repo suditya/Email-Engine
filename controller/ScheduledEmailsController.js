@@ -154,7 +154,7 @@ const SendEmailController = async (req, res) => {
                         }
                         else {
 
-                            
+
 
                             // console.log("object ", emailDate);
                             if (reminder === "Immediately") {
@@ -193,7 +193,7 @@ const SendEmailController = async (req, res) => {
 
                                 newTransporter.sendMail(mailOptions)
 
-                                await checkEmailEverySecond(descriptionPara,date,startTime,endTime);
+                                await checkEmailEverySecond(descriptionPara, date, startTime, endTime);
 
                                 res.send({
                                     status: "SUCCESS",
@@ -217,7 +217,7 @@ const SendEmailController = async (req, res) => {
                                 })
                                 await newScheduledEmails.save()
 
-                                await checkEmailEverySecond(descriptionPara,date,startTime,endTime);
+                                await checkEmailEverySecond(descriptionPara, date, startTime, endTime);
 
                                 res.send({
                                     status: "SUCCESS",
@@ -238,8 +238,8 @@ const SendEmailController = async (req, res) => {
 }
 
 
-async function checkEmailEverySecond(descriptionPara,date,startTime,endTime) {
-    
+async function checkEmailEverySecond(descriptionPara, date, startTime, endTime) {
+
 
     let scheduledEmail = await Emails.find()
 
@@ -251,16 +251,23 @@ async function checkEmailEverySecond(descriptionPara,date,startTime,endTime) {
 
         scheduledEmail.forEach(async function (response) {
 
-
             data = response.ScheduleDate
 
             console.log(new Date(data).toISOString().slice(0, -5));
             console.log(new Date().toISOString().slice(0, -5));
             console.log("");
 
-            if (new Date(data).toISOString().slice(0, -5) === new Date().toISOString().slice(0, -5)) {
+            if (new Date(data).toISOString().slice(0, -5) === new Date().toISOString().slice(0, -5) && response.sent === false) {
 
                 id = response._id
+
+                let newTransporter = nodemailer.createTransport({
+                    service: 'gmail',
+                    auth: {
+                        user: response.from,
+                        pass: response.password
+                    }
+                })
 
                 const mailOptions = {
                     from: response.from,
