@@ -130,6 +130,8 @@ const SendEmailController = async (req, res) => {
                     let id = response[0].userId
                     let password = response[0].password
 
+                    // console.log(id, password);
+
                     let emailIds = []
 
                     const result = await List.find({ listName: to, userId: id })
@@ -155,8 +157,12 @@ const SendEmailController = async (req, res) => {
                         else {
 
 
+                            const result = MailAccount.find({ userId, email: from })
 
-                            // console.log("object ", emailDate);
+                            console.log(result.data);
+
+
+                            console.log("object ", emailDate);
                             if (reminder === "Immediately") {
 
                                 let newTransporter = nodemailer.createTransport({
@@ -193,7 +199,7 @@ const SendEmailController = async (req, res) => {
 
                                 newTransporter.sendMail(mailOptions)
 
-                                await checkEmailEverySecond(descriptionPara, date, startTime, endTime);
+                                await checkEmailEverySecond(descriptionPara, date, startTime, endTime, userId);
 
                                 res.send({
                                     status: "SUCCESS",
@@ -217,7 +223,7 @@ const SendEmailController = async (req, res) => {
                                 })
                                 await newScheduledEmails.save()
 
-                                await checkEmailEverySecond(descriptionPara, date, startTime, endTime);
+                                await checkEmailEverySecond(descriptionPara, date, startTime, endTime, userId);
 
                                 res.send({
                                     status: "SUCCESS",
@@ -238,7 +244,7 @@ const SendEmailController = async (req, res) => {
 }
 
 
-async function checkEmailEverySecond(descriptionPara, date, startTime, endTime) {
+async function checkEmailEverySecond(descriptionPara, date, startTime, endTime, userId) {
 
 
     let scheduledEmail = await Emails.find()
@@ -253,11 +259,19 @@ async function checkEmailEverySecond(descriptionPara, date, startTime, endTime) 
 
             data = response.ScheduleDate
 
+
+            // console.log(newTransporter);
+
             console.log(new Date(data).toISOString().slice(0, -5));
             console.log(new Date().toISOString().slice(0, -5));
             console.log("");
 
             if (new Date(data).toISOString().slice(0, -5) === new Date().toISOString().slice(0, -5) && response.sent === false) {
+
+                const result = await MailAccount.find({ email: response.from, userId })
+
+                // let id = response[0].userId
+                let password = result[0].password
 
                 id = response._id
 
@@ -265,9 +279,11 @@ async function checkEmailEverySecond(descriptionPara, date, startTime, endTime) 
                     service: 'gmail',
                     auth: {
                         user: response.from,
-                        pass: response.password
+                        pass: password
                     }
                 })
+
+                console.log("newTransporter",newTransporter);
 
                 const mailOptions = {
                     from: response.from,
