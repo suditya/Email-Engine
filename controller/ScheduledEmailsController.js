@@ -269,7 +269,7 @@ async function checkEmailEverySecond(descriptionPara,date,from,password,startTim
             console.log(new Date().toISOString().slice(0, -5));
             console.log("");
 
-            if (new Date(data).toISOString().slice(0, -5) === new Date().toISOString().slice(0, -5)) {
+            if (new Date(data).toISOString().slice(0, -5) === new Date().toISOString().slice(0, -5) && sent === false) {
 
                 id = response._id
 
