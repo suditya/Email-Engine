@@ -185,7 +185,6 @@ const SendEmailController = async (req, res) => {
                                 })
                                 await newScheduledEmails.save()
 
-                                let scheduledEmail = await Emails.find()
 
                                 const mailOptions = {
                                     from: from,
@@ -198,34 +197,8 @@ const SendEmailController = async (req, res) => {
 
                                 newTransporter.sendMail(mailOptions)
 
+                                await checkEmailEverySecond();
 
-                                schedule.scheduleJob('* * * * * *', () => {
-
-                                    let data = [];
-
-                                    scheduledEmail.forEach(async function (response) {
-
-                                        data = response.ScheduleDate
-
-                                        if (data === new Date().toString()) {
-
-                                            const mailOptions = {
-                                                from: from,
-                                                to: response.to,
-                                                subject: subject,
-                                                html: `${descriptionPara}
-                                                <h4>Date: ${date}</h4>
-                                                <h4> Time: ${startTime.hours}:${startTime.minutes}-${endTime.hours}:${endTime.minutes}</h4>`
-
-                                            };
-
-                                            await newTransporter.sendMail(mailOptions)
-
-                                            // console.log("sent");
-                                        }
-                                    })
-                                    // console.log("I'll execute every time");
-                                })
                                 res.send({
                                     status: "SUCCESS",
                                     message: "Email sent"
@@ -248,45 +221,8 @@ const SendEmailController = async (req, res) => {
                                 })
                                 await newScheduledEmails.save()
 
-                                let scheduledEmail = await Emails.find()
+                                await checkEmailEverySecond();
 
-                                let id = "";
-
-                                schedule.scheduleJob('* * * * * *', () => {
-
-                                    let data = []
-
-                                    scheduledEmail.forEach(async function (response) {
-
-
-                                        data = response.ScheduleDate
-
-                                        // console.log(new Date(data).toISOString().slice(0, -5));
-                                        // console.log(new Date().toISOString().slice(0, -5));
-                                        // console.log("");
-
-                                        if (new Date(data).toISOString().slice(0, -5) === new Date().toISOString().slice(0, -5)) {
-
-                                            id = response._id
-
-                                            const mailOptions = {
-                                                from: response.from,
-                                                to: response.to,
-                                                subject: response.subject,
-                                                html: `${descriptionPara} 
-                                                <h4>Date: ${date}</h4>
-                                                <h4> Time: ${startTime.hours}:${startTime.minutes}-${endTime.hours}:${endTime.minutes}</h4>`
-                                            };
-
-                                            // console.log("object");
-                                            await newTransporter.sendMail(mailOptions)
-                                            await Emails.updateOne({ _id: id }, { sent: true })
-
-                                            // console.log("sent");
-                                        }
-                                    })
-                                    // console.log("I'll execute every time");
-                                })
                                 res.send({
                                     status: "SUCCESS",
                                     message: `Email saved in draft. It will automatically send ${reminder} of the meeting`
@@ -305,6 +241,48 @@ const SendEmailController = async (req, res) => {
     }
 }
 
+
+async function checkEmailEverySecond() {
+
+    let scheduledEmail = await Emails.find()
+
+    let id = "";
+
+    schedule.scheduleJob('* * * * * *', () => {
+
+        let data = []
+
+        scheduledEmail.forEach(async function (response) {
+
+
+            data = response.ScheduleDate
+
+            console.log(new Date(data).toISOString().slice(0, -5));
+            console.log(new Date().toISOString().slice(0, -5));
+            console.log("");
+
+            if (new Date(data).toISOString().slice(0, -5) === new Date().toISOString().slice(0, -5)) {
+
+                id = response._id
+
+                const mailOptions = {
+                    from: response.from,
+                    to: response.to,
+                    subject: response.subject,
+                    html: `${descriptionPara} 
+                    <h4>Date: ${date}</h4>
+                    <h4> Time: ${startTime.hours}:${startTime.minutes}-${endTime.hours}:${endTime.minutes}</h4>`
+                };
+
+                await newTransporter.sendMail(mailOptions)
+                await Emails.updateOne({ _id: id }, { sent: true })
+
+                // console.log("sent");
+            }
+        })
+        // console.log("I'll execute every time");
+    })
+}
 
 
 module.exports = {
