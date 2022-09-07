@@ -169,6 +169,8 @@ const SendEmailController = async (req, res) => {
                                 }
                             })
 
+                            // console.log("object", from, password);
+
                             console.log("object ", emailDate);
                             if (reminder === "Immediately") {
                                 const newScheduledEmails = new ScheduledEmails({
@@ -244,13 +246,9 @@ const SendEmailController = async (req, res) => {
 
 async function checkEmailEverySecond(descriptionPara,date,from,password,startTime,endTime) {
 
-    let newTransporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: from,
-            pass: password
-        }
-    })
+    // console.log(from, password);
+
+    
 
     let scheduledEmail = await Emails.find()
 
@@ -262,12 +260,20 @@ async function checkEmailEverySecond(descriptionPara,date,from,password,startTim
 
         scheduledEmail.forEach(async function (response) {
 
+            let newTransporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: response.from,
+                    pass: response.password
+                }
+            })
+
 
             data = response.ScheduleDate
 
-            console.log(new Date(data).toISOString().slice(0, -5));
-            console.log(new Date().toISOString().slice(0, -5));
-            console.log("");
+            // console.log(new Date(data).toISOString().slice(0, -5));
+            // console.log(new Date().toISOString().slice(0, -5));
+            // console.log("");
 
             if (new Date(data).toISOString().slice(0, -5) === new Date().toISOString().slice(0, -5) && sent === false) {
 
