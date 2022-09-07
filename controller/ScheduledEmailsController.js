@@ -101,8 +101,6 @@ const SendEmailController = async (req, res) => {
                 let emailDate = new Date(`${date}T${startTime.hours}:${startTime.minutes}`)
 
                 if (emailDate < new Date()) {
-                    console.log(emailDate);
-                    console.log(new Date());
                     throw new Error("Select date and time should be greater then today's date and time")
                 }
 
@@ -127,11 +125,6 @@ const SendEmailController = async (req, res) => {
 
                 else {
 
-                    console.log(emailDate);
-                    console.log(new Date());
-
-                    // console.log("newEmailDate",newEmailDate);
-
                     const response = await MailAccount.find({ email: from, userId })
 
                     let id = response[0].userId
@@ -141,7 +134,7 @@ const SendEmailController = async (req, res) => {
 
                     const result = await List.find({ listName: to, userId: id })
 
-                    console.log(result);
+                    // console.log(result);
 
                     if (!result.length) {
                         throw new Error("There is no email")
@@ -161,18 +154,19 @@ const SendEmailController = async (req, res) => {
                         }
                         else {
 
-                            let newTransporter = nodemailer.createTransport({
-                                service: 'gmail',
-                                auth: {
-                                    user: from,
-                                    pass: password
-                                }
-                            })
+                            
 
-                            // console.log("object", from, password);
-
-                            console.log("object ", emailDate);
+                            // console.log("object ", emailDate);
                             if (reminder === "Immediately") {
+
+                                let newTransporter = nodemailer.createTransport({
+                                    service: 'gmail',
+                                    auth: {
+                                        user: from,
+                                        pass: password
+                                    }
+                                })
+
                                 const newScheduledEmails = new ScheduledEmails({
                                     userId: userId,
                                     subject: subject,
@@ -199,7 +193,7 @@ const SendEmailController = async (req, res) => {
 
                                 newTransporter.sendMail(mailOptions)
 
-                                await checkEmailEverySecond(descriptionPara,date,from,password,startTime,endTime);
+                                await checkEmailEverySecond(descriptionPara,date,startTime,endTime);
 
                                 res.send({
                                     status: "SUCCESS",
@@ -223,7 +217,7 @@ const SendEmailController = async (req, res) => {
                                 })
                                 await newScheduledEmails.save()
 
-                                await checkEmailEverySecond(descriptionPara,date,from,password,startTime,endTime);
+                                await checkEmailEverySecond(descriptionPara,date,startTime,endTime);
 
                                 res.send({
                                     status: "SUCCESS",
@@ -244,10 +238,7 @@ const SendEmailController = async (req, res) => {
 }
 
 
-async function checkEmailEverySecond(descriptionPara,date,from,password,startTime,endTime) {
-
-    // console.log(from, password);
-
+async function checkEmailEverySecond(descriptionPara,date,startTime,endTime) {
     
 
     let scheduledEmail = await Emails.find()
@@ -260,22 +251,14 @@ async function checkEmailEverySecond(descriptionPara,date,from,password,startTim
 
         scheduledEmail.forEach(async function (response) {
 
-            let newTransporter = nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: response.from,
-                    pass: response.password
-                }
-            })
-
 
             data = response.ScheduleDate
 
-            // console.log(new Date(data).toISOString().slice(0, -5));
-            // console.log(new Date().toISOString().slice(0, -5));
-            // console.log("");
+            console.log(new Date(data).toISOString().slice(0, -5));
+            console.log(new Date().toISOString().slice(0, -5));
+            console.log("");
 
-            if (new Date(data).toISOString().slice(0, -5) === new Date().toISOString().slice(0, -5) && response.sent === false) {
+            if (new Date(data).toISOString().slice(0, -5) === new Date().toISOString().slice(0, -5)) {
 
                 id = response._id
 
