@@ -20,7 +20,8 @@ const ScheduledEmailsController = async (req, res) => {
         }
         else {
             const result = await ScheduledEmails.find({ userId: req.params['userId'] }).sort({
-                meetingDate: -1
+                meetingDate: -1,
+                startTime: -1
             })
 
             if (result.length == 0) {
@@ -92,17 +93,23 @@ const SendEmailController = async (req, res) => {
             throw new Error("You don't have the access")
         }
         else {
-            if (startTime.hours > endTime.hours) {
+            if (startTime.hours > endTime.hours || (startTime.hours === endTime.hours && startTime.minutes > endTime.minutes)) {
                 throw new Error("Start time should be less then end time")
             }
             else {
 
                 let emailDate = new Date(`${date}T${startTime.hours}:${startTime.minutes}`)
 
-                emailDate.setHours(emailDate.getHours()-5);
-                emailDate.setMinutes(emailDate.getMinutes()-30);
+                if (emailDate < new Date()) {
+                    console.log(emailDate);
+                    console.log(new Date());
+                    throw new Error("Select date and time should be greater then today's date and time")
+                }
 
-                console.log("email",emailDate);
+                emailDate.setHours(emailDate.getHours() - 5);
+                emailDate.setMinutes(emailDate.getMinutes() - 30);
+
+                // console.log("email",emailDate);
 
                 if (reminder === "Before 1 hour") {
                     emailDate.setMinutes(emailDate.getMinutes() + 1);
@@ -117,13 +124,11 @@ const SendEmailController = async (req, res) => {
                     emailDate.setHours(emailDate.getHours() - 24);
                 }
 
-                if (emailDate.toString() < new Date().toString()) {
-                    console.log(emailDate);
 
-                    throw new Error("Select date and time should be greater then today's date and time")
-                   
-                }
                 else {
+
+                    console.log(emailDate);
+                    console.log(new Date());
 
                     // console.log("newEmailDate",newEmailDate);
 
@@ -164,7 +169,7 @@ const SendEmailController = async (req, res) => {
                                 }
                             })
 
-                            console.log("object ", emailDate );
+                            console.log("object ", emailDate);
                             if (reminder === "Immediately") {
                                 const newScheduledEmails = new ScheduledEmails({
                                     userId: userId,
@@ -227,8 +232,7 @@ const SendEmailController = async (req, res) => {
                                 })
 
                             }
-                            else 
-                            {
+                            else {
 
                                 const newScheduledEmails = new ScheduledEmails({
                                     userId: userId,
@@ -257,12 +261,9 @@ const SendEmailController = async (req, res) => {
 
                                         data = response.ScheduleDate
 
-                                        console.log(new Date(data).toISOString().slice(0, -5));
-                                        console.log(new Date().toISOString().slice(0, -5));
-
-                                        // console.log(data);
-                                        // console.log(new Date().toISOString());
-                                        console.log("");
+                                        // console.log(new Date(data).toISOString().slice(0, -5));
+                                        // console.log(new Date().toISOString().slice(0, -5));
+                                        // console.log("");
 
                                         if (new Date(data).toISOString().slice(0, -5) === new Date().toISOString().slice(0, -5)) {
 
