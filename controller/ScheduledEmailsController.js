@@ -262,7 +262,7 @@ const SendEmailController = async (req, res) => {
 
                                         data = response.ScheduleDate
 
-                                        console.log(data.slice(0, -5));
+                                        console.log(data.toISOString().slice(0, -5));
                                         console.log(new Date().toISOString().slice(0, -5));
 
                                         // console.log(data);
