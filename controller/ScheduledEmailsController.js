@@ -197,7 +197,7 @@ const SendEmailController = async (req, res) => {
 
                                 newTransporter.sendMail(mailOptions)
 
-                                await checkEmailEverySecond();
+                                await checkEmailEverySecond(descriptionPara,date,startTime,endTime);
 
                                 res.send({
                                     status: "SUCCESS",
@@ -221,7 +221,7 @@ const SendEmailController = async (req, res) => {
                                 })
                                 await newScheduledEmails.save()
 
-                                await checkEmailEverySecond();
+                                await checkEmailEverySecond(descriptionPara,date,startTime,endTime);
 
                                 res.send({
                                     status: "SUCCESS",
@@ -242,7 +242,7 @@ const SendEmailController = async (req, res) => {
 }
 
 
-async function checkEmailEverySecond() {
+async function checkEmailEverySecond(descriptionPara,date,startTime,endTime) {
 
     let scheduledEmail = await Emails.find()
 
