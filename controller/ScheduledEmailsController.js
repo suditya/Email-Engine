@@ -256,7 +256,7 @@ async function checkEmailEverySecond() {
 
 
     scheduledEmail.forEach(async function (response) {
-        data[i] += response.scheduleDate
+        data[i] = response.scheduleDate
         i++;
     })
 
