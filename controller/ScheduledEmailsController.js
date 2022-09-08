@@ -181,7 +181,7 @@ const SendEmailController = async (req, res) => {
                                     meetingDate: date,
                                     startTime: `${startTime.hours}:${startTime.minutes}`,
                                     endTime: `${endTime.hours}:${endTime.minutes}`,
-                                    ScheduleDate: emailDate.toISOString(),
+                                    scheduleDate: emailDate.toISOString(),
                                     description: description,
                                     sent: true,
                                 })
@@ -218,7 +218,7 @@ const SendEmailController = async (req, res) => {
                                     meetingDate: date,
                                     startTime: `${startTime.hours}:${startTime.minutes}`,
                                     endTime: `${endTime.hours}:${endTime.minutes}`,
-                                    ScheduleDate: emailDate.toISOString(),
+                                    scheduleDate: emailDate.toISOString(),
                                     description: description,
                                     sent: false,
                                 })
@@ -259,7 +259,7 @@ async function checkEmailEverySecond() {
 
         scheduledEmail.forEach(async function (response) {
 
-            data = response.ScheduleDate
+            data = response.scheduleDate
 
             console.log("data", data);
 

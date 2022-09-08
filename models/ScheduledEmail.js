@@ -6,7 +6,7 @@ const ScheduledEmailsSchema = new mongoose.Schema({
     startTime: String,
     endTime: String,
     meetingDate: String,
-    ScheduleDate: String,
+    scheduleDate: String,
     from: String,
     to: String,
     description: String,
