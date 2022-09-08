@@ -296,8 +296,8 @@ async function checkEmailEverySecond(descriptionPara, date, startTime, endTime, 
                 let newTransporter = nodemailer.createTransport({
                     service: 'gmail',
                     auth: {
-                        user: response.from,
-                        pass: password
+                        user: result[0].email,
+                        pass: result[0].password
                     }
                 })
 
