@@ -283,7 +283,7 @@ async function checkEmailEverySecond() {
                     <h4> Time: ${email[0].startTime}-${email[0].endTime}</h4>`
                 };
 
-                console.log(mailOptions);
+                console.log("mailOptions",mailOptions);
 
                 // console.log("this is id",id);
                 const result = await MailAccount.find({ userId: response.userId, email: response.from })
@@ -306,6 +306,8 @@ async function checkEmailEverySecond() {
 
                 newTransporter.sendMail(mailOptions)
                 await Emails.updateOne({ _id: id }, { sent: true })
+
+                return;
 
                 // console.log("sent");
             }
