@@ -248,13 +248,11 @@ const SendEmailController = async (req, res) => {
 async function checkEmailEverySecond() {
 
 
-    
+    let scheduledEmail = await Emails.find()
 
     
 
     schedule.scheduleJob('* * * * * *', () => {
-        
-        let scheduledEmail = await Emails.find()
 
         let data = []
 
