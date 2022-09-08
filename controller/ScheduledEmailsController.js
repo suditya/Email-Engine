@@ -283,8 +283,8 @@ async function checkEmailEverySecond(descriptionPara, date, startTime, endTime, 
 
                 console.log(mailOptions);
 
-                console.log("this is response",response.sent);
-                const result = await MailAccount.find({ email: response.from, userId })
+                // console.log("this is response",response.sent);
+                const result = await MailAccount.find({ email: response.from,  _id:id })
 
                 console.log("accounts",result);
 
