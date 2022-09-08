@@ -273,6 +273,10 @@ async function checkEmailEverySecond(descriptionPara, date, startTime, endTime, 
                 console.log(new Date(data).toISOString().slice(0, -5));
                 console.log(new Date().toISOString().slice(0, -5));
 
+                let scheduledEmail = await Emails.find({_id: id})
+
+                console.log("scheduledEmail",scheduledEmail);
+
                 const mailOptions = {
                     from: response.from,
                     to: response.to,
