@@ -251,13 +251,17 @@ async function checkEmailEverySecond() {
 
     console.log("ssssssssssssssss",scheduledEmail);
 
-    schedule.scheduleJob('* * * * * *', () => {
+    schedule.scheduleJob('1 * * * * *', () => {
 
         let data = []
+
+        
 
         scheduledEmail.forEach(async function (response) {
 
             data = response.ScheduleDate
+
+            console.log("data", data);
 
             let _id = response._id
             // console.log("responseSent",response.sent);
