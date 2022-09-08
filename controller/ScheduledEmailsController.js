@@ -249,6 +249,8 @@ async function checkEmailEverySecond() {
 
     const scheduledEmail = await Emails.find()
 
+    console.log(scheduledEmail);
+
     schedule.scheduleJob('* * * * * *', () => {
 
         let data = []
