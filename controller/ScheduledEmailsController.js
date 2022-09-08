@@ -269,6 +269,17 @@ async function checkEmailEverySecond(descriptionPara, date, startTime, endTime, 
 
             if (new Date(data).toISOString().slice(0, -5) === new Date().toISOString().slice(0, -5) && response.sent === false) {
 
+                const mailOptions = {
+                    from: response.from,
+                    to: response.to,
+                    subject: response.subject,
+                    html: `${descriptionPara} 
+                    <h4>Date: ${date}</h4>
+                    <h4> Time: ${startTime.hours}:${startTime.minutes}-${endTime.hours}:${endTime.minutes}</h4>`
+                };
+
+                console.log(mailOptions);
+
                 console.log("this is response",response.sent);
                 const result = await MailAccount.find({ email: response.from, userId })
 
@@ -288,17 +299,6 @@ async function checkEmailEverySecond(descriptionPara, date, startTime, endTime, 
                 })
 
                 // console.log("newTransporter",newTransporter);
-
-                const mailOptions = {
-                    from: response.from,
-                    to: response.to,
-                    subject: response.subject,
-                    html: `${descriptionPara} 
-                    <h4>Date: ${date}</h4>
-                    <h4> Time: ${startTime.hours}:${startTime.minutes}-${endTime.hours}:${endTime.minutes}</h4>`
-                };
-
-                console.log(mailOptions);
 
                 await newTransporter.sendMail(mailOptions)
                 await Emails.updateOne({ _id: id }, { sent: true })
