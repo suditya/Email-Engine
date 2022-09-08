@@ -10,7 +10,7 @@ const ScheduledEmailsSchema = new mongoose.Schema({
     from: String,
     to: String,
     description: String,
-    sent: Boolean,
+    sent: String,
 
 })
 

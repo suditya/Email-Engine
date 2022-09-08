@@ -156,200 +156,73 @@ const SendEmailController = async (req, res) => {
                         }
                         else {
 
+                            if (reminder === "Immediately") {
 
-                            MailAccount.find({ userId, email: from })
+                                let newTransporter = nodemailer.createTransport({
+                                    service: 'gmail',
+                                    auth: {
+                                        user: from,
+                                        pass: password
+                                    }
+                                })
 
-                            // console.log(result.data);
-
-
-                            // console.log("object ", emailDate);
-
-                            const newScheduledEmails = new ScheduledEmails({
-                                userId: userId,
-                                subject: subject,
-                                from: from,
-                                to: emailIds.toString(),
-                                meetingDate: date,
-                                startTime: `${startTime.hours}:${startTime.minutes}`,
-                                endTime: `${endTime.hours}:${endTime.minutes}`,
-                                scheduleDate: emailDate.toISOString(),
-                                description: description,
-                                sent: false,
-                            })
-                            await newScheduledEmails.save()
-
-                            await checkEmailEverySecond();
-
-                            res.send({
-                                status: "SUCCESS",
-                                message: `Email saved in draft. It will automatically send ${reminder} of the meeting`
-                            })
-                        }
-                    }
-                }
-            }
-        }
-    } catch (error) {
-        res.send({
-            status: "FAILED",
-            message: error.message,
-        });
-    }
-}
+                                const newScheduledEmails = new ScheduledEmails({
+                                    userId: userId,
+                                    subject: subject,
+                                    from: from,
+                                    to: emailIds.toString(),
+                                    meetingDate: date,
+                                    startTime: `${startTime.hours}:${startTime.minutes}`,
+                                    endTime: `${endTime.hours}:${endTime.minutes}`,
+                                    scheduleDate: emailDate.toISOString(),
+                                    description: description,
+                                    sent: "Yes",
+                                })
+                                await newScheduledEmails.save()
 
 
-
-const sendEmailImmediateController = async (req, res) => {
-    try {
-
-        let { subject, from, to, description, startTime, endTime, date, reminder, userId } = req.body
-
-        // console.log(new Date(`${date}T${startTime.hours}:${startTime.minutes}`).toUTCString());
-
-        let textArray = description.split(/^/gm)
-
-        // ^ - asserts position at start of a line
-        // g - modifier: global. All matches (don't return after first match)
-        // m - modifier: multi line. Causes ^ and $ to match the begin/end of each line (not only begin/end of string)
-
-
-        let descriptionPara = "";
-
-        textArray.forEach(description => {
-            let res = deleteLast2chars(description);
-            let newPara = `<p>${res}</p>`;
-            descriptionPara += newPara
-        })
-
-        function deleteLast2chars(sentence) {
-            return sentence.slice(0, -1);
-        }
-
-        // console.log("new Date",new Date());
-
-        const token = req.headers['authorization']
-
-        if (token == "null") {
-            throw new Error("You don't have the access")
-        }
-        else {
-            if (startTime.hours > endTime.hours || (startTime.hours === endTime.hours && startTime.minutes > endTime.minutes)) {
-                throw new Error("Start time should be less then end time")
-            }
-            else {
-
-                let emailDate = new Date(`${date}T${startTime.hours}:${startTime.minutes}`)
-
-                if (emailDate < new Date()) {
-                    throw new Error("Select date and time should be greater then today's date and time")
-                }
-
-                emailDate.setHours(emailDate.getHours() - 5);
-                emailDate.setMinutes(emailDate.getMinutes() - 30);
-
-                // console.log("email",emailDate);
-
-                if (reminder === "Before 1 hour") {
-                    emailDate.setMinutes(emailDate.getMinutes() + 1);
-                }
-                if (reminder === "Before 6 hour") {
-                    emailDate.setHours(emailDate.getHours() - 6);
-                }
-                if (reminder === "Before 12 hour") {
-                    emailDate.setHours(emailDate.getHours() - 12);
-                }
-                if (reminder === "Before 1 day") {
-                    emailDate.setHours(emailDate.getHours() - 24);
-                }
-
-
-                else {
-
-                    const response = await MailAccount.find({ email: from, userId })
-
-                    let id = response[0].userId
-                    let password = response[0].password
-
-                    // console.log(id, password);
-
-                    let emailIds = []
-
-                    const result = await List.find({ listName: to, userId: id })
-
-                    // console.log(result);
-
-                    if (!result.length) {
-                        throw new Error("There is no email")
-                    }
-                    else {
-                        let id = result[0]._id;
-                        const response = await UserEmail.find({ userId: id })
-
-                        let i = 0;
-                        response.forEach(function (response) {
-                            emailIds[i] = response.email
-                            i++;
-                        })
-                        // console.log("ye bhi result h",result);
-                        if (emailIds.length == 0) {
-                            throw new Error(`No email found in ${result[0].listName} List`)
-                        }
-                        else {
-
-
-                            MailAccount.find({ userId, email: from })
-
-                            // console.log(result.data);
-
-
-                            // console.log("object ", emailDate);
-
-
-                            let newTransporter = nodemailer.createTransport({
-                                service: 'gmail',
-                                auth: {
-                                    user: from,
-                                    pass: password
-                                }
-                            })
-
-                            const newScheduledEmails = new ScheduledEmails({
-                                userId: userId,
-                                subject: subject,
-                                from: from,
-                                to: emailIds.toString(),
-                                meetingDate: date,
-                                startTime: `${startTime.hours}:${startTime.minutes}`,
-                                endTime: `${endTime.hours}:${endTime.minutes}`,
-                                scheduleDate: emailDate.toISOString(),
-                                description: descriptionPara,
-                                sent: true,
-                            })
-                            await newScheduledEmails.save()
-
-
-                            const mailOptions = {
-                                from: from,
-                                to: emailIds.toString(),
-                                subject: subject,
-                                html: `${descriptionPara}
+                                const mailOptions = {
+                                    from: from,
+                                    to: emailIds.toString(),
+                                    subject: subject,
+                                    html: `${descriptionPara}
                                     <h4>Date: ${date}</h4>
                                     <h4> Time: ${startTime.hours}:${startTime.minutes}-${endTime.hours}:${endTime.minutes}</h4>`
-                            };
+                                };
 
-                            await newTransporter.sendMail(mailOptions)
+                                newTransporter.sendMail(mailOptions)
 
-                            await checkEmailEverySecond();
+                                
 
-                            await checkEmailEverySecond();
+                                res.send({
+                                    status: "SUCCESS",
+                                    message: "Email sent"
+                                })
 
-                            res.send({
-                                status: "SUCCESS",
-                                message: "Email sent"
-                            })
+                            }
+                            else {
 
+                                const newScheduledEmails = new ScheduledEmails({
+                                    userId: userId,
+                                    subject: subject,
+                                    from: from,
+                                    to: emailIds.toString(),
+                                    meetingDate: date,
+                                    startTime: `${startTime.hours}:${startTime.minutes}`,
+                                    endTime: `${endTime.hours}:${endTime.minutes}`,
+                                    scheduleDate: emailDate.toISOString(),
+                                    description: description,
+                                    sent: "InProcess",
+                                })
+                                await newScheduledEmails.save()
 
+                                await checkEmailEverySecond();
 
+                                res.send({
+                                    status: "SUCCESS",
+                                    message: `Email saved in draft. It will automatically send ${reminder} of the meeting`
+                                })
+                            }
                         }
                     }
                 }
@@ -362,14 +235,179 @@ const sendEmailImmediateController = async (req, res) => {
         });
     }
 }
+
+
+
+// const sendEmailImmediateController = async (req, res) => {
+//     try {
+
+//         let { subject, from, to, description, startTime, endTime, date, reminder, userId } = req.body
+
+//         // console.log(new Date(`${date}T${startTime.hours}:${startTime.minutes}`).toUTCString());
+
+//         let textArray = description.split(/^/gm)
+
+//         // ^ - asserts position at start of a line
+//         // g - modifier: global. All matches (don't return after first match)
+//         // m - modifier: multi line. Causes ^ and $ to match the begin/end of each line (not only begin/end of string)
+
+
+//         let descriptionPara = "";
+
+//         textArray.forEach(description => {
+//             let res = deleteLast2chars(description);
+//             let newPara = `<p>${res}</p>`;
+//             descriptionPara += newPara
+//         })
+
+//         function deleteLast2chars(sentence) {
+//             return sentence.slice(0, -1);
+//         }
+
+//         // console.log("new Date",new Date());
+
+//         const token = req.headers['authorization']
+
+//         if (token == "null") {
+//             throw new Error("You don't have the access")
+//         }
+//         else {
+//             if (startTime.hours > endTime.hours || (startTime.hours === endTime.hours && startTime.minutes > endTime.minutes)) {
+//                 throw new Error("Start time should be less then end time")
+//             }
+//             else {
+
+//                 let emailDate = new Date(`${date}T${startTime.hours}:${startTime.minutes}`)
+
+//                 if (emailDate < new Date()) {
+//                     throw new Error("Select date and time should be greater then today's date and time")
+//                 }
+
+//                 emailDate.setHours(emailDate.getHours() - 5);
+//                 emailDate.setMinutes(emailDate.getMinutes() - 30);
+
+//                 // console.log("email",emailDate);
+
+//                 if (reminder === "Before 1 hour") {
+//                     emailDate.setMinutes(emailDate.getMinutes() + 1);
+//                 }
+//                 if (reminder === "Before 6 hour") {
+//                     emailDate.setHours(emailDate.getHours() - 6);
+//                 }
+//                 if (reminder === "Before 12 hour") {
+//                     emailDate.setHours(emailDate.getHours() - 12);
+//                 }
+//                 if (reminder === "Before 1 day") {
+//                     emailDate.setHours(emailDate.getHours() - 24);
+//                 }
+
+
+//                 else {
+
+//                     const response = await MailAccount.find({ email: from, userId })
+
+//                     let id = response[0].userId
+//                     let password = response[0].password
+
+//                     // console.log(id, password);
+
+//                     let emailIds = []
+
+//                     const result = await List.find({ listName: to, userId: id })
+
+//                     // console.log(result);
+
+//                     if (!result.length) {
+//                         throw new Error("There is no email")
+//                     }
+//                     else {
+//                         let id = result[0]._id;
+//                         const response = await UserEmail.find({ userId: id })
+
+//                         let i = 0;
+//                         response.forEach(function (response) {
+//                             emailIds[i] = response.email
+//                             i++;
+//                         })
+//                         // console.log("ye bhi result h",result);
+//                         if (emailIds.length == 0) {
+//                             throw new Error(`No email found in ${result[0].listName} List`)
+//                         }
+//                         else {
+
+
+//                             MailAccount.find({ userId, email: from })
+
+//                             // console.log(result.data);
+
+
+//                             // console.log("object ", emailDate);
+
+
+//                             let newTransporter = nodemailer.createTransport({
+//                                 service: 'gmail',
+//                                 auth: {
+//                                     user: from,
+//                                     pass: password
+//                                 }
+//                             })
+
+//                             const newScheduledEmails = new ScheduledEmails({
+//                                 userId: userId,
+//                                 subject: subject,
+//                                 from: from,
+//                                 to: emailIds.toString(),
+//                                 meetingDate: date,
+//                                 startTime: `${startTime.hours}:${startTime.minutes}`,
+//                                 endTime: `${endTime.hours}:${endTime.minutes}`,
+//                                 scheduleDate: emailDate.toISOString(),
+//                                 description: descriptionPara,
+//                                 sent: true,
+//                             })
+//                             await newScheduledEmails.save()
+
+
+//                             const mailOptions = {
+//                                 from: from,
+//                                 to: emailIds.toString(),
+//                                 subject: subject,
+//                                 html: `${descriptionPara}
+//                                     <h4>Date: ${date}</h4>
+//                                     <h4> Time: ${startTime.hours}:${startTime.minutes}-${endTime.hours}:${endTime.minutes}</h4>`
+//                             };
+
+//                             await newTransporter.sendMail(mailOptions)
+
+//                             await checkEmailEverySecond();
+
+//                             res.send({
+//                                 status: "SUCCESS",
+//                                 message: "Email sent"
+//                             })
+
+
+
+//                         }
+//                     }
+//                 }
+//             }
+//         }
+//     } catch (error) {
+//         res.send({
+//             status: "FAILED",
+//             message: error.message,
+//         });
+//     }
+// }
 
 
 
 async function checkEmailEverySecond() {
 
-    const scheduledEmail = await Emails.find()
+    let arr = []
+    schedule.scheduleJob('* * * * * *', async () => {
 
-    schedule.scheduleJob('* * * * * *', () => {
+        const scheduledEmail = await Emails.find()
 
         let data = []
 
@@ -387,20 +425,23 @@ async function checkEmailEverySecond() {
 
             // console.log(newTransporter);
 
-            console.log(new Date(data).toISOString().slice(0, -5));
-            console.log(new Date().toISOString().slice(0, -5));
-            console.log("");
+            // let b = 0;
+            // for(let i=0; i<100000000; i++){
+            //     b = i;
+            // }
+            // console.log(b);
 
-            if (new Date(data).toISOString().slice(0, -5) === new Date().toISOString().slice(0, -5) && response.sent === false) {
+            if (response.sent === "InProcess" && data.toISOString().slice(0, -5) === new Date().toISOString().slice(0, -5)) {
 
+                // console.log(data.toISOString().slice(0, -5));
+                // console.log(new Date().toISOString().slice(0, -5));
 
-                // console.log("response", response);
+                arr[0] = response
+                console.log("response", arr[0]);
+                console.log("hhcvjhdshvkhbdvkbdjv");
 
-                await Emails.updateOne({ _id }, { sent: true })
+                await Emails.updateOne({ _id }, { sent: "yes" })
                 // console.log("Updated result ", resultttt);
-
-                console.log(new Date(data).toISOString().slice(0, -5));
-                console.log(new Date().toISOString().slice(0, -5));
 
                 let email = await Emails.findOne({ _id })
 
@@ -439,8 +480,6 @@ async function checkEmailEverySecond() {
                 // console.log("hooooooo gyaaaaaaaaa");
                 await newTransporter.sendMail(mailOptions)
 
-
-                // console.log("sent");
             }
         })
         // console.log("I'll execute every time");
@@ -450,7 +489,7 @@ async function checkEmailEverySecond() {
 
 module.exports = {
     ScheduledEmailsController,
-    sendEmailImmediateController,
+    // sendEmailImmediateController,
     DeleteMeetingController,
     SendEmailController
 }
