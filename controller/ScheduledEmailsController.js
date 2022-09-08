@@ -270,7 +270,7 @@ async function checkEmailEverySecond() {
 
                 const resultttt = await Emails.updateOne({ _id}, { sent: true })
                 console.log("Updated result ",resultttt);
-                
+
                 console.log(new Date(data).toISOString().slice(0, -5));
                 console.log(new Date().toISOString().slice(0, -5));
 
@@ -290,7 +290,7 @@ async function checkEmailEverySecond() {
                 console.log("mailOptions",mailOptions);
 
                 // console.log("this is id",id);
-                const result = await MailAccount.findOne({ userId: response.userId, email: response.from })
+                const result = await MailAccount.findOne({ userId: email.userId, email: email.from })
 
                 console.log("accounts", result);
 
