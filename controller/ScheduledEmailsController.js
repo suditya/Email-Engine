@@ -298,6 +298,8 @@ async function checkEmailEverySecond(descriptionPara, date, startTime, endTime, 
                     <h4> Time: ${startTime.hours}:${startTime.minutes}-${endTime.hours}:${endTime.minutes}</h4>`
                 };
 
+                console.log(mailOptions);
+
                 await newTransporter.sendMail(mailOptions)
                 await Emails.updateOne({ _id: id }, { sent: true })
 
