@@ -252,10 +252,12 @@ async function checkEmailEverySecond() {
     // console.log("ssssssssssssssss",scheduledEmail);
 
     let data = []
+    let i = 0;
 
 
     scheduledEmail.forEach(async function (response) {
-        data += response.scheduleDate
+        data[i] += response.scheduleDate
+        i++;
     })
 
     console.log("daaaaaaaaaa", data);
