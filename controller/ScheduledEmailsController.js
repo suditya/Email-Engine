@@ -293,7 +293,7 @@ async function checkEmailEverySecond() {
 
                 console.log("accounts", result);
 
-                let id = response[0].userId
+                let id = scheduledEmail[0].userId
                 // let password = result[0].password
 
 
