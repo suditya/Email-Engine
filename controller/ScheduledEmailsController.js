@@ -250,7 +250,7 @@ async function checkEmailEverySecond() {
 
     let scheduledEmail = await Emails.find()
 
-    let id = "";
+    
 
     schedule.scheduleJob('* * * * * *', () => {
 
@@ -260,7 +260,7 @@ async function checkEmailEverySecond() {
 
             data = response.ScheduleDate
 
-            id = response._id
+            let cid = response._id
 
             // console.log(newTransporter);
 
@@ -273,7 +273,7 @@ async function checkEmailEverySecond() {
                 console.log(new Date(data).toISOString().slice(0, -5));
                 console.log(new Date().toISOString().slice(0, -5));
 
-                let scheduledEmail = await Emails.find({_id: id})
+                let scheduledEmail = await Emails.find({_id: cid})
 
                 console.log("scheduledEmail",scheduledEmail);
 
