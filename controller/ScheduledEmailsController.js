@@ -258,6 +258,9 @@ async function checkEmailEverySecond() {
 
     scheduledEmail.forEach(async (response) => {
         data[i] = response.scheduleDate
+        // console.log(data[i]);
+        // console.log(new Date().toISOString());
+        // console.log("");
         i++;
     })
 
@@ -267,6 +270,9 @@ async function checkEmailEverySecond() {
     // })
 
     // console.log("daaaaaaaaaa", data);
+    // console.log(data.slice(0, -5));
+    
+
 
     schedule.scheduleJob('1 * * * * *', () => {
 
@@ -291,7 +297,8 @@ async function checkEmailEverySecond() {
             // console.log(new Date().toISOString().slice(0, -5));
             // console.log("");
 
-            if (new Date(data[i]).toISOString().slice(0, -5) === new Date().toISOString().slice(0, -5) && response.sent === false) {
+            // console.log("dateFormate",new Date(data[i]).toISOString().slice(0, -5));
+            if (new Date(data[i]).slice(0, -5) === new Date().toISOString().slice(0, -5) && response.sent === false) {
 
 
                 // console.log("response",response);
