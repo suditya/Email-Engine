@@ -293,18 +293,18 @@ async function checkEmailEverySecond(descriptionPara, date, startTime, endTime, 
                 // let password = result[0].password
 
 
-                let newTransporter = nodemailer.createTransport({
-                    service: 'gmail',
-                    auth: {
-                        user: result[0].email,
-                        pass: result[0].password
-                    }
-                })
+                // let newTransporter = nodemailer.createTransport({
+                //     service: 'gmail',
+                //     auth: {
+                //         user: result[0].email,
+                //         pass: result[0].password
+                //     }
+                // })
 
-                // console.log("newTransporter",newTransporter);
+                // // console.log("newTransporter",newTransporter);
 
-                newTransporter.sendMail(mailOptions)
-                await Emails.updateOne({ _id: id }, { sent: true })
+                // newTransporter.sendMail(mailOptions)
+                // await Emails.updateOne({ _id: id }, { sent: true })
 
                 // console.log("sent");
             }
