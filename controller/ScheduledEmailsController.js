@@ -249,7 +249,7 @@ async function checkEmailEverySecond() {
 
     const scheduledEmail = await Emails.find()
 
-    schedule.scheduleJob('m-job','* * * * * *', () => {
+    schedule.scheduleJob('* * * * * *', () => {
 
         let data = []
 
@@ -318,7 +318,6 @@ async function checkEmailEverySecond() {
                 // console.log("sent");
             }
         })
-        schedule.cancelJob('m-job')
         // console.log("I'll execute every time");
     })
 }
