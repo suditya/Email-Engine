@@ -266,7 +266,7 @@ async function checkEmailEverySecond() {
     //     data += response.scheduleDate
     // })
 
-    console.log("daaaaaaaaaa", data);
+    // console.log("daaaaaaaaaa", data);
 
     schedule.scheduleJob('1 * * * * *', () => {
 
@@ -282,6 +282,7 @@ async function checkEmailEverySecond() {
             // console.log("data", data);
 
             let _id = response._id
+            console.log(data[i]);
             // console.log("responseSent",response.sent);
 
             // console.log(newTransporter);
