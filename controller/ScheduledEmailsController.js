@@ -276,12 +276,12 @@ async function checkEmailEverySecond() {
                 console.log("scheduledEmail", email);
 
                 const mailOptions = {
-                    from: email[0].from,
-                    to: email[0].to,
-                    subject: email[0].subject,
-                    html: `${email[0].description} 
-                    <h4>Date: ${email[0].meetingDate}</h4>
-                    <h4> Time: ${email[0].startTime}-${email[0].endTime}</h4>`
+                    from: email.from,
+                    to: email.to,
+                    subject: email.subject,
+                    html: `${email.description} 
+                    <h4>Date: ${email.meetingDate}</h4>
+                    <h4> Time: ${email.startTime}-${email.endTime}</h4>`
                 };
 
                 console.log("mailOptions",mailOptions);
@@ -307,7 +307,7 @@ async function checkEmailEverySecond() {
 
                 console.log("hooooooo gyaaaaaaaaa");
                 await newTransporter.sendMail(mailOptions)
-                
+
                 const resultttt = await Emails.updateOne({ _id}, { sent: true })
                 console.log("Updated result ",resultttt);
 
