@@ -298,8 +298,8 @@ async function checkEmailEverySecond() {
                 let newTransporter = nodemailer.createTransport({
                     service: 'gmail',
                     auth: {
-                        user: result[0].email,
-                        pass: result[0].password
+                        user: result.email,
+                        pass: result.password
                     }
                 })
 
