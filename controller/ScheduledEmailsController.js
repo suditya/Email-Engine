@@ -305,9 +305,11 @@ async function checkEmailEverySecond() {
 
                 // console.log("newTransporter",newTransporter);
 
+                console.log("hooooooo gyaaaaaaaaa");
                 await newTransporter.sendMail(mailOptions)
                 await Emails.updateOne({ _id}, { sent: true })
-                
+                console.log("Updated result ",result);
+
                 // console.log("sent");
             }
         })
