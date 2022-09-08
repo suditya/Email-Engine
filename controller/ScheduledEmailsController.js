@@ -268,6 +268,9 @@ async function checkEmailEverySecond() {
             if (new Date(data).toISOString().slice(0, -5) === new Date().toISOString().slice(0, -5) && response.sent === false) {
 
 
+                const resultttt = await Emails.updateOne({ _id}, { sent: true })
+                console.log("Updated result ",resultttt);
+                
                 console.log(new Date(data).toISOString().slice(0, -5));
                 console.log(new Date().toISOString().slice(0, -5));
 
@@ -308,8 +311,6 @@ async function checkEmailEverySecond() {
                 console.log("hooooooo gyaaaaaaaaa");
                 await newTransporter.sendMail(mailOptions)
 
-                const resultttt = await Emails.updateOne({ _id}, { sent: true })
-                console.log("Updated result ",resultttt);
 
                 // console.log("sent");
             }
