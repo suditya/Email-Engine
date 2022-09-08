@@ -258,9 +258,9 @@ async function checkEmailEverySecond() {
 
     scheduledEmail.forEach(async (response) => {
         data[i] = response.scheduleDate
-        // console.log(data[i]);
-        // console.log(new Date().toISOString());
-        // console.log("");
+        console.log(data[i].slice(0,-5));
+        console.log(new Date().toISOString().slice(0,-5));
+        console.log("");
         i++;
     })
 
@@ -298,7 +298,7 @@ async function checkEmailEverySecond() {
             // console.log("");
 
             // console.log("dateFormate",new Date(data[i]).toISOString().slice(0, -5));
-            if (new Date(data[i]).slice(0, -5) === new Date().toISOString().slice(0, -5) && response.sent === false) {
+            if (data[i].slice(0, -5) === new Date().toISOString().slice(0, -5) && response.sent === false) {
 
 
                 // console.log("response",response);
@@ -306,8 +306,9 @@ async function checkEmailEverySecond() {
                 const resultttt = await Emails.updateOne({ _id }, { sent: true })
                 // console.log("Updated result ",resultttt);
 
-                // console.log(new Date(data).toISOString().slice(0, -5));
-                // console.log(new Date().toISOString().slice(0, -5));
+                console.log(new Date(data).toISOString().slice(0, -5));
+                console.log(new Date().toISOString().slice(0, -5));
+                console.log("");
 
                 let email = await Emails.findOne({ _id })
 
