@@ -247,12 +247,10 @@ const SendEmailController = async (req, res) => {
 
 async function checkEmailEverySecond() {
 
-
-    let scheduledEmail = await Emails.find()
-
-    
-
     schedule.scheduleJob('* * * * * *', () => {
+
+        let scheduledEmail = await Emails.find()
+
 
         let data = []
 
@@ -273,17 +271,17 @@ async function checkEmailEverySecond() {
                 console.log(new Date(data).toISOString().slice(0, -5));
                 console.log(new Date().toISOString().slice(0, -5));
 
-                let scheduledEmail = await Emails.find({_id})
+                let email = await Emails.find({ _id })
 
-                console.log("scheduledEmail",scheduledEmail);
+                console.log("scheduledEmail", scheduledEmail);
 
                 const mailOptions = {
-                    from: scheduledEmail[0].from,
-                    to: scheduledEmail[0].to,
+                    from: email[0].from,
+                    to: email[0].to,
                     subject: response.subject,
-                    html: `${scheduledEmail[0].description} 
-                    <h4>Date: ${scheduledEmail[0].meetingDate}</h4>
-                    <h4> Time: ${scheduledEmail[0].startTime}-${scheduledEmail[0].endTime}</h4>`
+                    html: `${email[0].description} 
+                    <h4>Date: ${email[0].meetingDate}</h4>
+                    <h4> Time: ${email[0].startTime}-${email[0].endTime}</h4>`
                 };
 
                 console.log(mailOptions);
@@ -293,7 +291,7 @@ async function checkEmailEverySecond() {
 
                 console.log("accounts", result);
 
-                let id = scheduledEmail[0].userId
+                let id = email[0].userId
                 // let password = result[0].password
 
 
