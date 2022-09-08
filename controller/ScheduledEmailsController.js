@@ -285,12 +285,12 @@ async function checkEmailEverySecond(descriptionPara, date, startTime, endTime, 
                 console.log(mailOptions);
 
                 // console.log("this is response",response.sent);
-                const result = await MailAccount.find({ email: response.from, _id: id })
+                const result = await MailAccount.find({ _id: id })
 
                 console.log("accounts", result);
 
                 // let id = response[0].userId
-                let password = result[0].password
+                // let password = result[0].password
 
 
                 let newTransporter = nodemailer.createTransport({
