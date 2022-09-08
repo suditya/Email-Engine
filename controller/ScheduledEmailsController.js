@@ -249,7 +249,7 @@ async function checkEmailEverySecond() {
 
     const scheduledEmail = await Emails.find()
 
-    console.log(scheduledEmail);
+    console.log("ssssssssssssssss",scheduledEmail);
 
     schedule.scheduleJob('* * * * * *', () => {
 
