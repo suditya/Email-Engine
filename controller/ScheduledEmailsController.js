@@ -404,7 +404,7 @@ const SendEmailController = async (req, res) => {
 
 async function checkEmailEverySecond() {
 
-    let arr = []
+    // let arr = []
     schedule.scheduleJob('* * * * * *', async () => {
 
         const scheduledEmail = await Emails.find()
@@ -436,9 +436,9 @@ async function checkEmailEverySecond() {
                 // console.log(data.toISOString().slice(0, -5));
                 // console.log(new Date().toISOString().slice(0, -5));
 
-                arr[0] = response
-                console.log("response", arr[0]);
-                console.log("hhcvjhdshvkhbdvkbdjv");
+                // arr[0] = response
+                // console.log("response", arr[0]);
+                // console.log("hhcvjhdshvkhbdvkbdjv");
 
                 await Emails.updateOne({ _id }, { sent: "yes" })
                 // console.log("Updated result ", resultttt);
