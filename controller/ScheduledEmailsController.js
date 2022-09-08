@@ -248,11 +248,13 @@ const SendEmailController = async (req, res) => {
 async function checkEmailEverySecond() {
 
 
-    let scheduledEmail = await Emails.find()
+    
 
     
 
     schedule.scheduleJob('* * * * * *', () => {
+        
+        let scheduledEmail = await Emails.find()
 
         let data = []
 
@@ -282,7 +284,7 @@ async function checkEmailEverySecond() {
                     to: scheduledEmail[0].to,
                     subject: response.subject,
                     html: `${scheduledEmail[0].description} 
-                    <h4>Date: ${scheduledEmail[0].date}</h4>
+                    <h4>Date: ${scheduledEmail[0].meetingDate}</h4>
                     <h4> Time: ${scheduledEmail[0].startTime}-${scheduledEmail[0].endTime}</h4>`
                 };
 
