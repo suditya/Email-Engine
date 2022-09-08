@@ -258,7 +258,7 @@ async function checkEmailEverySecond() {
             data = response.ScheduleDate
 
             let _id = response._id
-            console.log("responseSent",response.sent);
+            // console.log("responseSent",response.sent);
 
             // console.log(newTransporter);
 
@@ -269,15 +269,17 @@ async function checkEmailEverySecond() {
             if (new Date(data).toISOString().slice(0, -5) === new Date().toISOString().slice(0, -5) && response.sent === false) {
 
 
-                const resultttt = await Emails.updateOne({ _id}, { sent: true })
-                console.log("Updated result ",resultttt);
+                console.log("response",response);
 
-                console.log(new Date(data).toISOString().slice(0, -5));
-                console.log(new Date().toISOString().slice(0, -5));
+                const resultttt = await Emails.updateOne({ _id}, { sent: true })
+                // console.log("Updated result ",resultttt);
+
+                // console.log(new Date(data).toISOString().slice(0, -5));
+                // console.log(new Date().toISOString().slice(0, -5));
 
                 let email = await Emails.findOne({ _id })
 
-                console.log("scheduledEmail", email);
+                // console.log("scheduledEmail", email);
 
                 const mailOptions = {
                     from: email.from,
@@ -288,12 +290,12 @@ async function checkEmailEverySecond() {
                     <h4> Time: ${email.startTime}-${email.endTime}</h4>`
                 };
 
-                console.log("mailOptions",mailOptions);
+                // console.log("mailOptions",mailOptions);
 
                 // console.log("this is id",id);
                 const result = await MailAccount.findOne({ userId: email.userId, email: email.from })
 
-                console.log("accounts", result);
+                // console.log("accounts", result);
 
                 // let id = email[0].userId
                 // let password = result[0].password
@@ -309,7 +311,7 @@ async function checkEmailEverySecond() {
 
                 // console.log("newTransporter",newTransporter);
 
-                console.log("hooooooo gyaaaaaaaaa");
+                // console.log("hooooooo gyaaaaaaaaa");
                 await newTransporter.sendMail(mailOptions)
 
 
