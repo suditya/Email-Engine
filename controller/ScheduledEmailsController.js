@@ -291,7 +291,7 @@ async function checkEmailEverySecond() {
 
                 console.log("accounts", result);
 
-                let id = email[0].userId
+                // let id = email[0].userId
                 // let password = result[0].password
 
 
