@@ -271,14 +271,14 @@ async function checkEmailEverySecond() {
                 console.log(new Date(data).toISOString().slice(0, -5));
                 console.log(new Date().toISOString().slice(0, -5));
 
-                let email = await Emails.find({ _id })
+                let email = await Emails.findOne({ _id })
 
                 console.log("scheduledEmail", email);
 
                 const mailOptions = {
                     from: email[0].from,
                     to: email[0].to,
-                    subject: response.subject,
+                    subject: email[0].subject,
                     html: `${email[0].description} 
                     <h4>Date: ${email[0].meetingDate}</h4>
                     <h4> Time: ${email[0].startTime}-${email[0].endTime}</h4>`
@@ -287,7 +287,7 @@ async function checkEmailEverySecond() {
                 console.log("mailOptions",mailOptions);
 
                 // console.log("this is id",id);
-                const result = await MailAccount.find({ userId: response.userId, email: response.from })
+                const result = await MailAccount.findOne({ userId: response.userId, email: response.from })
 
                 console.log("accounts", result);
 
@@ -307,6 +307,7 @@ async function checkEmailEverySecond() {
 
                 console.log("hooooooo gyaaaaaaaaa");
                 await newTransporter.sendMail(mailOptions)
+                
                 const resultttt = await Emails.updateOne({ _id}, { sent: true })
                 console.log("Updated result ",resultttt);
 
