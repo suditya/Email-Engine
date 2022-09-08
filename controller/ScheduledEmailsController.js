@@ -159,10 +159,10 @@ const SendEmailController = async (req, res) => {
 
                             const result = MailAccount.find({ userId, email: from })
 
-                            console.log(result.data);
+                            // console.log(result.data);
 
 
-                            console.log("object ", emailDate);
+                            // console.log("object ", emailDate);
                             if (reminder === "Immediately") {
 
                                 let newTransporter = nodemailer.createTransport({
@@ -199,7 +199,8 @@ const SendEmailController = async (req, res) => {
 
                                 newTransporter.sendMail(mailOptions)
 
-                                await checkEmailEverySecond(descriptionPara, date, startTime, endTime, userId);
+                                const result = await checkEmailEverySecond(descriptionPara, date, startTime, endTime, userId);
+                                console.log("this is result",result);
 
                                 res.send({
                                     status: "SUCCESS",
@@ -262,13 +263,16 @@ async function checkEmailEverySecond(descriptionPara, date, startTime, endTime, 
 
             // console.log(newTransporter);
 
-            console.log(new Date(data).toISOString().slice(0, -5));
-            console.log(new Date().toISOString().slice(0, -5));
-            console.log("");
+            // console.log(new Date(data).toISOString().slice(0, -5));
+            // console.log(new Date().toISOString().slice(0, -5));
+            // console.log("");
 
             if (new Date(data).toISOString().slice(0, -5) === new Date().toISOString().slice(0, -5) && response.sent === false) {
 
+                console.log("this is response",response.sent);
                 const result = await MailAccount.find({ email: response.from, userId })
+
+                console.log("accounts",result);
 
                 // let id = response[0].userId
                 let password = result[0].password
