@@ -258,6 +258,7 @@ async function checkEmailEverySecond() {
             data = response.ScheduleDate
 
             let _id = response._id
+            console.log("responseSent",response.sent);
 
             // console.log(newTransporter);
 
