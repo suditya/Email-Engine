@@ -287,7 +287,7 @@ async function checkEmailEverySecond(descriptionPara, date, startTime, endTime, 
                     }
                 })
 
-                console.log("newTransporter",newTransporter);
+                // console.log("newTransporter",newTransporter);
 
                 const mailOptions = {
                     from: response.from,
