@@ -272,7 +272,7 @@ async function checkEmailEverySecond() {
 
                 let email = await Emails.find({ _id })
 
-                console.log("scheduledEmail", scheduledEmail);
+                console.log("scheduledEmail", email);
 
                 const mailOptions = {
                     from: email[0].from,
