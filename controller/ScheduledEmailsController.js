@@ -64,8 +64,6 @@ const SendEmailController = async (req, res) => {
 
         let { subject, from, to, description, startTime, endTime, date, reminder, userId } = req.body
 
-        // console.log(new Date(`${date}T${startTime.hours}:${startTime.minutes}`).toUTCString());
-
         let textArray = description.split(/^/gm)
 
         // ^ - asserts position at start of a line
@@ -84,8 +82,6 @@ const SendEmailController = async (req, res) => {
         function deleteLast2chars(sentence) {
             return sentence.slice(0, -1);
         }
-
-        // console.log("new Date",new Date());
 
         const token = req.headers['authorization']
 
@@ -106,8 +102,6 @@ const SendEmailController = async (req, res) => {
 
                 emailDate.setHours(emailDate.getHours() - 5);
                 emailDate.setMinutes(emailDate.getMinutes() - 30);
-
-                // console.log("email",emailDate);
 
                 if (reminder === "Before 1 hour") {
                     emailDate.setMinutes(emailDate.getMinutes() + 1);
@@ -130,13 +124,10 @@ const SendEmailController = async (req, res) => {
                     let id = response[0].userId
                     let password = response[0].password
 
-                    // console.log(id, password);
-
                     let emailIds = []
 
                     const result = await List.find({ listName: to, userId: id })
 
-                    // console.log(result);
 
                     if (!result.length) {
                         throw new Error("There is no email")
@@ -150,7 +141,6 @@ const SendEmailController = async (req, res) => {
                             emailIds[i] = response.email
                             i++;
                         })
-                        // console.log("ye bhi result h",result);
                         if (emailIds.length == 0) {
                             throw new Error(`No email found in ${result[0].listName} List`)
                         }
@@ -285,7 +275,6 @@ async function checkEmailEverySecond() {
                 }
             }
         })
-        // console.log("I'll execute every time");
     })
 }
 
