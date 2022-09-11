@@ -109,10 +109,10 @@ const SendEmailController = async (req, res) => {
                 if (reminder === "Before 1 hour of the meeting") {
                     emailDate.setMinutes(emailDate.getMinutes() + 1);
                 }
-                if (reminder === "Before 6 hour of the meeting") {
+                if (reminder === "Before 6 hours of the meeting") {
                     emailDate.setHours(emailDate.getHours() - 6);
                 }
-                if (reminder === "Before 12 hour of the meeting") {
+                if (reminder === "Before 12 hours of the meeting") {
                     emailDate.setHours(emailDate.getHours() - 12);
                 }
                 if (reminder === "Before 1 day of the meeting") {
@@ -275,10 +275,10 @@ const SendEmailIndividualController = async (req, res) => {
                 if (reminder === "Before 1 hour of the meeting") {
                     emailDate.setMinutes(emailDate.getMinutes() + 1);
                 }
-                if (reminder === "Before 6 hour of the meeting") {
+                if (reminder === "Before 6 hours of the meeting") {
                     emailDate.setHours(emailDate.getHours() - 6);
                 }
-                if (reminder === "Before 12 hour of the meeting") {
+                if (reminder === "Before 12 hours of the meeting") {
                     emailDate.setHours(emailDate.getHours() - 12);
                 }
                 if (reminder === "Before 1 day of the meeting") {
