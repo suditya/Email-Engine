@@ -81,7 +81,7 @@ const SigninController = async (req, res) => {
                     })
                 }
                 else {
-                    throw new Error("Invalid password entered")
+                    throw new Error("Invalid credentials entered")
                 }
             }
         }

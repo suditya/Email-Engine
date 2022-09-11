@@ -165,7 +165,7 @@ const SendEmailController = async (req, res) => {
                                     startTime: `${startTime.hours}:${startTime.minutes}`,
                                     endTime: `${endTime.hours}:${endTime.minutes}`,
                                     scheduleDate: emailDate.toISOString(),
-                                    description: description,
+                                    description: descriptionPara,
                                     sent: "Yes",
                                 })
                                 await newScheduledEmails.save()
@@ -201,7 +201,7 @@ const SendEmailController = async (req, res) => {
                                     startTime: `${startTime.hours}:${startTime.minutes}`,
                                     endTime: `${endTime.hours}:${endTime.minutes}`,
                                     scheduleDate: emailDate.toISOString(),
-                                    description: description,
+                                    description: descriptionPara,
                                     sent: "InProcess",
                                 })
                                 await newScheduledEmails.save()
@@ -247,6 +247,7 @@ async function checkEmailEverySecond() {
 
             if (response.sent === "InProcess" && data.toISOString().slice(0, -5) === new Date().toISOString().slice(0, -5)) {
 
+                // console.log("response", response);
                 const update = await Emails.updateOne({ _id }, { sent: "yes" })
 
                 let email = await Emails.findOne({ _id })
