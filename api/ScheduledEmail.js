@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 
-const { ScheduledEmailsController, SendEmailController, DeleteMeetingController } = require('../controller/ScheduledEmailsController')
+const { ScheduledEmailsController, SendEmailController, SendEmailIndividualController, DeleteMeetingController } = require('../controller/ScheduledEmailsController')
 
 
 router.get('/ScheduledEmails/:userId', (req, res) => {
@@ -13,11 +13,13 @@ router.get('/DeleteMeeting/:userId', (req, res) => {
     DeleteMeetingController(req, res)
 })
 
-
 router.post('/sendEmail', (req, res) => {
     SendEmailController(req, res)
 })
 
+router.post('/sendEmailIndividual', (req, res) => {
+    SendEmailIndividualController(req, res)
+})
 
 
 module.exports = router;

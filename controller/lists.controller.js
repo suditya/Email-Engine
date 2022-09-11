@@ -72,13 +72,13 @@ const AddUserController = async (req, res) => {
             let _id = result[0]._id
 
             if (!result.length) {
-                throw new Error("You dont have any list. Please add a list first")
+                throw new Error("You don't have any list. Please add a list first")
             }
             else {
                 const result = await UserEmail.find({ userId: _id, email })
 
                 if (result.length) {
-                    throw new Error(`Email is already there in ${listName} list`)
+                    throw new Error(`Email is already exist inside the ${listName} list`)
                 }
                 else {
                     const newUserEmail = new UserEmail({
