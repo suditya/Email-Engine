@@ -269,8 +269,8 @@ const SendEmailIndividualController = async (req, res) => {
                     throw new Error("Select date and time must be greater than today's date and time")
                 }
 
-                // emailDate.setHours(emailDate.getHours() - 5);
-                // emailDate.setMinutes(emailDate.getMinutes() - 30);
+                emailDate.setHours(emailDate.getHours() - 5);
+                emailDate.setMinutes(emailDate.getMinutes() - 30);
 
                 if (reminder === "Before 1 hour of the meeting") {
                     emailDate.setMinutes(emailDate.getMinutes() + 1);
@@ -380,8 +380,8 @@ async function checkEmailEverySecond() {
 
             data = new Date(data)
 
-            data.setHours(data.getHours() + 5);
-            data.setMinutes(data.getMinutes() + 30);
+            // data.setHours(data.getHours() + 5);
+            // data.setMinutes(data.getMinutes() + 30);
 
             let _id = response._id
 
