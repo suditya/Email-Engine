@@ -20,6 +20,7 @@ const VerificationRouter = require('./api/Verification');
 const AccountRouter = require('./api/Account');
 const ListRouter = require('./api/List');
 const ScheduledEmail = require('./api/ScheduledEmail');
+
 app.use('/api/user', UserRouter)
 app.use('/api/verification', VerificationRouter)
 app.use('/api/account', AccountRouter)

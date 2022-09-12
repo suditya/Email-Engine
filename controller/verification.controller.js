@@ -38,7 +38,7 @@ const SendOTPVerificationEmail = async ({ _id, email }, res) => {
             userId: _id,
             otp: hashedOTP,
             createdAt: Date.now(),
-            expiresAt: Date.now() + 36000000,
+            expiresAt: Date.now() + 3600000,
         })
 
         await newOTPVerification.save();
@@ -64,7 +64,6 @@ const SendOTPVerificationEmail = async ({ _id, email }, res) => {
 const ReSendOTPController = async (req, res) => {
     try {
         let { email } = req.body;
-        email = email.trim();
 
         const result = await User.find({ email }, { verified: 1 })
 

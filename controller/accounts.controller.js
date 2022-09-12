@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken')
 const MailAccount = require('../models/MailAccount')
 
 
@@ -5,22 +6,25 @@ const MailAccountsController = async (req, res) => {
     try {
         let token = req.headers['authorization']
 
-        if (token == "null") {
-            throw new Error("You don't have the access")
-        }
-        else {
-            const data = await MailAccount.find({ userId: req.params['userId'] })
-
-            if (data.length == 0) {
-                throw new Error("No account is there")
+        await jwt.verify(token, process.env.JWT_KEY, async (err) => {
+            if (err) {
+                throw new Error("You don't have the access")
             }
             else {
-                res.send({
-                    status: "SUCCESS",
-                    data: data
-                })
+                const data = await MailAccount.find({ userId: req.params['userId'] })
+
+                if (data.length == 0) {
+                    throw new Error("No account is there")
+                }
+                else {
+                    res.send({
+                        status: "SUCCESS",
+                        data: data
+                    })
+                }
             }
-        }
+        })
+
     } catch (error) {
         res.send({
             status: "FAILED",
@@ -31,39 +35,39 @@ const MailAccountsController = async (req, res) => {
 
 const AddAccountController = async (req, res) => {
     try {
-        const token = req.headers['authorization']
 
         let { companyName, email, password, userId } = req.body;
 
-        companyName = companyName.trim();
-        email = email.trim();
-        password = password.trim();
+        let token = req.headers['authorization']
 
-        if (token == "null") {
-            throw new Error("You don't have the access")
-        }
-        else {
-            const result = await MailAccount.find({ email, userId })
-
-            if (result.length) {
-                throw new Error("User with this email id is already exist")
+        await jwt.verify(token, process.env.JWT_KEY, async (err) => {
+            if (err) {
+                throw new Error("You don't have the access")
             }
             else {
-                const newAddAccount = new MailAccount({
-                    userId: userId,
-                    companyName: companyName,
-                    email: email,
-                    password: password
-                })
+                const result = await MailAccount.find({ email, userId })
 
-                await newAddAccount.save();
+                if (result.length) {
+                    throw new Error("User with this email id is already exist")
+                }
+                else {
+                    const newAddAccount = new MailAccount({
+                        userId: userId,
+                        companyName: companyName,
+                        email: email,
+                        password: password
+                    })
 
-                res.send({
-                    status: "Success",
-                    message: "Account added successfully"
-                })
+                    await newAddAccount.save();
+
+                    res.send({
+                        status: "Success",
+                        message: "Account added successfully"
+                    })
+                }
             }
-        }
+        })
+
     } catch (error) {
         res.send({
             status: "FAILED",
@@ -75,27 +79,30 @@ const AddAccountController = async (req, res) => {
 const DeleteAccountController = async (req, res) => {
     try {
 
-        const token = req.headers['authorization']
         let id = req.params['_id'];
 
-        if (token == "null") {
-            throw new Error("You don't have the access")
-        }
-        else {
-            const result = await MailAccount.find({ _id: id })
+        let token = req.headers['authorization']
 
-            if (!result.length) {
-                throw new Error("There is no account with this name")
+        await jwt.verify(token, process.env.JWT_KEY, async (err) => {
+            if (err) {
+                throw new Error("You don't have the access")
             }
             else {
-                await MailAccount.deleteOne({ _id: req.params['_id'] })
+                const result = await MailAccount.find({ _id: id })
 
-                res.send({
-                    status: "SUCCESS",
-                    message: "Account has been deleted"
-                })
+                if (!result.length) {
+                    throw new Error("There is no account with this name")
+                }
+                else {
+                    await MailAccount.deleteOne({ _id: id })
+
+                    res.send({
+                        status: "SUCCESS",
+                        message: "Account has been deleted"
+                    })
+                }
             }
-        }
+        })
     } catch (error) {
         res.send({
             status: "FAILED",

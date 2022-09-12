@@ -20,7 +20,8 @@ const SignupController = async (req, res) => {
         }
         else {
             const saltRounds = 10
-            const hashedPassword = await bcrypt.hash(password, saltRounds)
+            const hashedPassword = await bcrypt.hash(password, saltRounds);
+
             const newUser = new User({
                 name,
                 email,
@@ -28,7 +29,7 @@ const SignupController = async (req, res) => {
                 verified: false
             });
 
-            await newUser.save();
+            await newUser.save();  //await User.insertMany(newUser);
             await SendOTPVerificationEmail(newUser, res);
         }
     } catch (error) {
@@ -43,50 +44,38 @@ const SignupController = async (req, res) => {
 const SigninController = async (req, res) => {
     try {
         let { email, password } = req.body;
-        email = email.trim();
-        password = password.trim();
-
 
         const data = await User.find({ email })
 
         if (data.length == 0) {
             throw new Error("Email i'd doesn't exist. Please Register first")
         }
-        else if (data.length) {
-            if (!data[0].verified) {
-                throw new Error("Email has not been verified yet")
-            }
-            else {
-                const hashedPassword = data[0].password;
-                const result = await bcrypt.compare(password, hashedPassword);
-
-                if (result) {
-                    const claims = {
-                        email: email
-                    }
-
-                    jwt.sign(claims, process.env.JWT_KEY, function (error, token) {
-                        if (error) {
-                            throw new Error("Error occured while checking token")
-                        } else {
-                            res.send({
-                                status: "SUCCESS",
-                                message: "Singin Successful",
-                                authToken: token,
-                                data: data,
-                                email: data[0].email,
-                                userId: data[0]._id
-                            })
-                        }
-                    })
-                }
-                else {
-                    throw new Error("Invalid credentials entered")
-                }
-            }
+        else if (!data[0].verified) {
+            throw new Error("Email has not been verified yet")
         }
         else {
-            throw new Error("Invalid credentials entered!")
+            const hashedPassword = data[0].password;
+            const result = await bcrypt.compare(password, hashedPassword);
+
+            if (result) {
+                const claims = {
+                    email: email
+                }
+
+                const token = await jwt.sign(claims, process.env.JWT_KEY)
+
+                res.send({
+                    status: "SUCCESS",
+                    message: "Singin Successful",
+                    authToken: token,
+                    data: data,
+                    email: data[0].email,
+                    userId: data[0]._id
+                })
+            }
+            else {
+                throw new Error("Invalid credentials entered")
+            }
         }
     } catch (error) {
         res.send({
@@ -94,8 +83,6 @@ const SigninController = async (req, res) => {
             message: error.message
         })
     }
-
-
 }
 
 module.exports = {
