@@ -20,7 +20,7 @@ const ScheduledEmailsController = async (req, res) => {
                 throw new Error("You don't have the access")
             }
             else {
-                const result = await ScheduledEmails.find({ userId: req.params['userId'] }).sort({
+                const result = await ScheduledEmails.find({ userId: req.params['userId'], tag: "Everyone" }).sort({
                     meetingDate: -1,
                     startTime: -1
                 })
@@ -45,6 +45,45 @@ const ScheduledEmailsController = async (req, res) => {
         });
     }
 }
+
+
+
+const ScheduledIndividualEmailsController = async (req, res) => {
+    try {
+
+        const token = req.headers['authorization']
+
+        await jwt.verify(token, process.env.JWT_KEY, async (err) => {
+            if (err) {
+                throw new Error("You don't have the access")
+            }
+            else {
+                const result = await ScheduledEmails.find({ userId: req.params['userId'], tag: "Individual" }).sort({
+                    meetingDate: -1,
+                    startTime: -1
+                })
+
+                if (result.length == 0) {
+                    throw new Error("No scheduled emails are there")
+                }
+                else {
+                    res.send({
+                        status: "SUCCESS",
+                        data: result
+                    });
+                }
+            }
+        })
+
+
+    } catch (error) {
+        res.send({
+            status: "FAILED",
+            message: error.message
+        });
+    }
+}
+
 
 const DeleteMeetingController = async (req, res) => {
     try {
@@ -179,6 +218,7 @@ const SendEmailController = async (req, res) => {
                                         scheduleDate: emailDate.toISOString(),
                                         description: descriptionPara,
                                         sent: "Yes",
+                                        tag: "Everyone"
                                     })
                                     await newScheduledEmails.save()
 
@@ -211,6 +251,7 @@ const SendEmailController = async (req, res) => {
                                         scheduleDate: emailDate.toISOString(),
                                         description: descriptionPara,
                                         sent: "InProcess",
+                                        tag: "Everyone"
                                     })
                                     await newScheduledEmails.save()
 
@@ -322,6 +363,7 @@ const SendEmailIndividualController = async (req, res) => {
                                 scheduleDate: emailDate.toISOString(),
                                 description: descriptionPara,
                                 sent: "Yes",
+                                tag: "Individual"
                             })
                             await newScheduledEmails.save()
 
@@ -356,6 +398,7 @@ const SendEmailIndividualController = async (req, res) => {
                                 scheduleDate: emailDate.toISOString(),
                                 description: descriptionPara,
                                 sent: "InProcess",
+                                tag: "Individual"
                             })
                             await newScheduledEmails.save()
 
@@ -434,6 +477,7 @@ async function checkEmailEverySecond() {
 
 module.exports = {
     ScheduledEmailsController,
+    ScheduledIndividualEmailsController,
     DeleteMeetingController,
     SendEmailController,
     SendEmailIndividualController

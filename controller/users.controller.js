@@ -5,13 +5,10 @@ const jwt = require('jsonwebtoken')
 
 const { SendOTPVerificationEmail } = require("./verification.controller")
 
+
 const SignupController = async (req, res) => {
     try {
         let { name, email, password } = req.body;
-        name = name.trim();
-        email = email.trim();
-        password = password.trim();
-
 
         const result = await User.find({ email })
 

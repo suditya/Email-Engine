@@ -11,6 +11,7 @@ const ScheduledEmailsSchema = new mongoose.Schema({
     to: String,
     description: String,
     sent: String,
+    tag: String
 
 })
 

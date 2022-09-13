@@ -1,4 +1,3 @@
-
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 
@@ -28,7 +27,7 @@ const SendOTPVerificationEmail = async ({ _id, email }, res) => {
             from: process.env.AUTH_EMAIL,
             to: email,
             subject: "Verify your email",
-            html: `<p>Enter the <b>${otp}</b> in the app to verify your email address and complete the signup process.</p><p>This code <b>expires in 1 hour</b>.</p>`
+            html: `<p>Enter the <b>${otp}</b> in the app to verify your email address and complete the signup process.</p><p>This otp will <b>expire in 1 hour</b>.</p>`
         };
 
         const saltRounds = 10;

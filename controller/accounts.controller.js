@@ -24,7 +24,6 @@ const MailAccountsController = async (req, res) => {
                 }
             }
         })
-
     } catch (error) {
         res.send({
             status: "FAILED",
@@ -88,19 +87,12 @@ const DeleteAccountController = async (req, res) => {
                 throw new Error("You don't have the access")
             }
             else {
-                const result = await MailAccount.find({ _id: id })
+                await MailAccount.deleteOne({ _id: id })
 
-                if (!result.length) {
-                    throw new Error("There is no account with this name")
-                }
-                else {
-                    await MailAccount.deleteOne({ _id: id })
-
-                    res.send({
-                        status: "SUCCESS",
-                        message: "Account has been deleted"
-                    })
-                }
+                res.send({
+                    status: "SUCCESS",
+                    message: "Account has been deleted"
+                })
             }
         })
     } catch (error) {
