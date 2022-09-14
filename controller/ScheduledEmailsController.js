@@ -437,8 +437,8 @@ async function checkEmailEverySecond() {
 
             data = new Date(data)
 
-            data.setHours(data.getHours() + 5);
-            data.setMinutes(data.getMinutes() + 30);
+            // data.setHours(data.getHours() + 5);
+            // data.setMinutes(data.getMinutes() + 30);
 
             let _id = response._id
 
