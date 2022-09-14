@@ -114,7 +114,7 @@ const SendEmailController = async (req, res) => {
         let { subject, from, to, description, startTime, endTime, date, reminder, userId } = req.body
 
         let textArray = description.split(/^/gm)
-        
+
 
         let descriptionPara = "";
 
@@ -203,32 +203,31 @@ const SendEmailController = async (req, res) => {
                                         }
                                     })
 
-                                    const newScheduledEmails = new ScheduledEmails({
-                                        userId: userId,
-                                        subject: subject,
-                                        from: from,
-                                        to: emailIds.toString(),
-                                        meetingDate: date,
-                                        startTime: `${startTime.hours}:${startTime.minutes}`,
-                                        endTime: `${endTime.hours}:${endTime.minutes}`,
-                                        scheduleDate: emailDate.toISOString(),
-                                        description: descriptionPara,
-                                        sent: "Yes",
-                                        tag: "Everyone"
-                                    })
-                                    await newScheduledEmails.save()
-
-
                                     const mailOptions = {
                                         from: from,
                                         to: emailIds.toString(),
                                         subject: subject,
                                         html: `${descriptionPara}
-                                        <h4>Date: ${date}</h4>
-                                        <h4> Time: ${startTime.hours}:${startTime.minutes}-${endTime.hours}:${endTime.minutes}</h4>`
+                                            <h4>Date: ${date}</h4>
+                                            <h4> Time: ${startTime.hours}:${startTime.minutes}-${endTime.hours}:${endTime.minutes}</h4>`
                                     };
 
-                                    newTransporter.sendMail(mailOptions).then(() => {
+                                    newTransporter.sendMail(mailOptions).then(async () => {
+
+                                        const newScheduledEmails = new ScheduledEmails({
+                                            userId: userId,
+                                            subject: subject,
+                                            from: from,
+                                            to: emailIds.toString(),
+                                            meetingDate: date,
+                                            startTime: `${startTime.hours}:${startTime.minutes}`,
+                                            endTime: `${endTime.hours}:${endTime.minutes}`,
+                                            scheduleDate: emailDate.toISOString(),
+                                            description: descriptionPara,
+                                            sent: "Yes",
+                                            tag: "Everyone"
+                                        })
+                                        await newScheduledEmails.save()
                                         res.send({
                                             status: "SUCCESS",
                                             message: "Email sent"
@@ -239,8 +238,6 @@ const SendEmailController = async (req, res) => {
                                             message: "Email and Password is wrong"
                                         })
                                     })
-
-
                                 }
                                 else {
                                     const newScheduledEmails = new ScheduledEmails({
@@ -286,7 +283,7 @@ const SendEmailIndividualController = async (req, res) => {
 
         let { subject, from, to, description, startTime, endTime, date, reminder, userId } = req.body
 
-        
+
 
         let textArray = description.split(/^/gm)
 
@@ -355,38 +352,43 @@ const SendEmailIndividualController = async (req, res) => {
                                 }
                             })
 
-                            const newScheduledEmails = new ScheduledEmails({
-                                userId: userId,
-                                subject: subject,
-                                from: from,
-                                to: to,
-                                meetingDate: date,
-                                startTime: `${startTime.hours}:${startTime.minutes}`,
-                                endTime: `${endTime.hours}:${endTime.minutes}`,
-                                scheduleDate: emailDate.toISOString(),
-                                description: descriptionPara,
-                                sent: "Yes",
-                                tag: "Individual"
-                            })
-                            await newScheduledEmails.save()
-
-
                             const mailOptions = {
                                 from: from,
                                 to: to,
                                 subject: subject,
                                 html: `${descriptionPara}
-                                        <h4>Date: ${date}</h4>
-                                        <h4> Time: ${startTime.hours}:${startTime.minutes}-${endTime.hours}:${endTime.minutes}</h4>`
+                                    <h4>Date: ${date}</h4>
+                                    <h4> Time: ${startTime.hours}:${startTime.minutes}-${endTime.hours}:${endTime.minutes}</h4>`
                             };
 
-                            newTransporter.sendMail(mailOptions)
+                            newTransporter.sendMail(mailOptions).then(async () => {
 
-                            await checkEmailEverySecond();
+                                const newScheduledEmails = new ScheduledEmails({
+                                    userId: userId,
+                                    subject: subject,
+                                    from: from,
+                                    to: to,
+                                    meetingDate: date,
+                                    startTime: `${startTime.hours}:${startTime.minutes}`,
+                                    endTime: `${endTime.hours}:${endTime.minutes}`,
+                                    scheduleDate: emailDate.toISOString(),
+                                    description: descriptionPara,
+                                    sent: "Yes",
+                                    tag: "Individual"
+                                })
+                                await newScheduledEmails.save()
 
-                            res.send({
-                                status: "SUCCESS",
-                                message: "Email sent"
+                                await checkEmailEverySecond();
+
+                                res.send({
+                                    status: "SUCCESS",
+                                    message: "Email sent"
+                                })
+                            }).catch(() => {
+                                res.send({
+                                    status: "FAILED",
+                                    message: "Email and Password is wrong"
+                                })
                             })
                         }
                         else {
