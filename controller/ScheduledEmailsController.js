@@ -12,7 +12,6 @@ const List = require('../models/List');
 
 const ScheduledEmailsController = async (req, res) => {
     try {
-
         const token = req.headers['authorization']
 
         await jwt.verify(token, process.env.JWT_KEY, async (err) => {
@@ -36,8 +35,6 @@ const ScheduledEmailsController = async (req, res) => {
                 }
             }
         })
-
-
     } catch (error) {
         res.send({
             status: "FAILED",
@@ -117,19 +114,18 @@ const SendEmailController = async (req, res) => {
         let { subject, from, to, description, startTime, endTime, date, reminder, userId } = req.body
 
         let textArray = description.split(/^/gm)
-
-        // ^ - asserts position at start of a line
-        // g - modifier: global. All matches (don't return after first match)
-        // m - modifier: multi line. Causes ^ and $ to match the begin/end of each line (not only begin/end of string)
-
+        
 
         let descriptionPara = "";
 
-        textArray.forEach(description => {
-            let res = deleteLast2chars(description);
+        for (let i = 0; i < textArray.length - 1; i++) {
+            let res = deleteLast2chars(textArray[i]);
             let newPara = `<p>${res}</p>`;
             descriptionPara += newPara
-        })
+        }
+
+        let lastPara = `<p>${textArray[textArray.length - 1]}</p>`
+        descriptionPara += lastPara
 
         function deleteLast2chars(sentence) {
             return sentence.slice(0, -1);
@@ -232,12 +228,19 @@ const SendEmailController = async (req, res) => {
                                         <h4> Time: ${startTime.hours}:${startTime.minutes}-${endTime.hours}:${endTime.minutes}</h4>`
                                     };
 
-                                    newTransporter.sendMail(mailOptions)
-
-                                    res.send({
-                                        status: "SUCCESS",
-                                        message: "Email sent"
+                                    newTransporter.sendMail(mailOptions).then(() => {
+                                        res.send({
+                                            status: "SUCCESS",
+                                            message: "Email sent"
+                                        })
+                                    }).catch(() => {
+                                        res.send({
+                                            status: "FAILED",
+                                            message: "Email and Password is wrong"
+                                        })
                                     })
+
+
                                 }
                                 else {
                                     const newScheduledEmails = new ScheduledEmails({
@@ -283,20 +286,20 @@ const SendEmailIndividualController = async (req, res) => {
 
         let { subject, from, to, description, startTime, endTime, date, reminder, userId } = req.body
 
+        
+
         let textArray = description.split(/^/gm)
-
-        // ^ - asserts position at start of a line
-        // g - modifier: global. All matches (don't return after first match)
-        // m - modifier: multi line. Causes ^ and $ to match the begin/end of each line (not only begin/end of string)
-
 
         let descriptionPara = "";
 
-        textArray.forEach(description => {
-            let res = deleteLast2chars(description);
+        for (let i = 0; i < textArray.length - 1; i++) {
+            let res = deleteLast2chars(textArray[i]);
             let newPara = `<p>${res}</p>`;
             descriptionPara += newPara
-        })
+        }
+
+        let lastPara = `<p>${textArray[textArray.length - 1]}</p>`
+        descriptionPara += lastPara
 
         function deleteLast2chars(sentence) {
             return sentence.slice(0, -1);
@@ -434,8 +437,8 @@ async function checkEmailEverySecond() {
 
             data = new Date(data)
 
-            // data.setHours(data.getHours() + 5);
-            // data.setMinutes(data.getMinutes() + 30);
+            data.setHours(data.getHours() + 5);
+            data.setMinutes(data.getMinutes() + 30);
 
             let _id = response._id
 
