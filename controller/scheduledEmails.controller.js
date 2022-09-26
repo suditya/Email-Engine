@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 
 const ScheduledEmails = require('../models/ScheduledEmail')
 const UserEmail = require('../models/UsersEmail')
-// const Emails = require('../models/ScheduledEmail')
+const Emails = require('../models/ScheduledEmail')
 const MailAccount = require('../models/MailAccount')
 const List = require('../models/List');
 
@@ -431,7 +431,7 @@ async function checkEmailEverySecond() {
 
     schedule.scheduleJob('* * * * * *', async () => {
 
-        const scheduledEmail = await ScheduledEmails.find()
+        const scheduledEmail = await Emails.find()
 
         scheduledEmail.forEach(async function (response) {
 
@@ -446,7 +446,7 @@ async function checkEmailEverySecond() {
 
             if (response.sent === "InProcess" && data.toISOString().slice(0, -5) === new Date().toISOString().slice(0, -5)) {
 
-                let email = await ScheduledEmails.findOne({ _id })
+                let email = await Emails.findOne({ _id })
 
                 let { from, to, subject, description, meetingDate, startTime, endTime, userId } = email
 
@@ -469,7 +469,7 @@ async function checkEmailEverySecond() {
                     }
                 })
 
-                const update = await ScheduledEmails.updateOne({ _id }, { sent: "yes" })
+                const update = await Emails.updateOne({ _id }, { sent: "yes" })
 
                 if (update.modifiedCount === 1) {
                     await newTransporter.sendMail(mailOptions)
