@@ -16,10 +16,7 @@ const ScheduledEmailsController = async (req, res) => {
 
         await jwt.verify(token, process.env.JWT_KEY, async (err) => {
             if (err) {
-                res.status(401).json({
-                    status: "FAILED",
-                    message: "You don't have the access"
-                })
+                throw new Error("You don't have the access")
             }
             else {
                 const result = await ScheduledEmails.find({ userId: req.params['userId'], tag: "Everyone" }).sort({
@@ -28,10 +25,7 @@ const ScheduledEmailsController = async (req, res) => {
                 })
 
                 if (result.length == 0) {
-                    res.status(401).json({
-                        status: "FAILED",
-                        message: "No scheduled emails are there"
-                    })
+                    throw new Error("No scheduled emails are there")
                 }
                 else {
                     res.send({
@@ -42,10 +36,10 @@ const ScheduledEmailsController = async (req, res) => {
             }
         })
     } catch (error) {
-        res.status(401).json({
-            staus: "FAILED",
-            message: error.message,
-        })
+        res.send({
+            status: "FAILED",
+            message: error.message
+        });
     }
 }
 
@@ -58,10 +52,7 @@ const ScheduledIndividualEmailsController = async (req, res) => {
 
         await jwt.verify(token, process.env.JWT_KEY, async (err) => {
             if (err) {
-                res.status(401).json({
-                    status: "FAILED",
-                    message: "You don't have the access"
-                })
+                throw new Error("You don't have the access")
             }
             else {
                 const result = await ScheduledEmails.find({ userId: req.params['userId'], tag: "Individual" }).sort({
@@ -70,10 +61,7 @@ const ScheduledIndividualEmailsController = async (req, res) => {
                 })
 
                 if (result.length == 0) {
-                    res.status(401).json({
-                        status: "FAILED",
-                        message: "No scheduled emails are there"
-                    })
+                    throw new Error("No scheduled emails are there")
                 }
                 else {
                     res.send({
@@ -86,10 +74,10 @@ const ScheduledIndividualEmailsController = async (req, res) => {
 
 
     } catch (error) {
-        res.status(401).json({
-            staus: "FAILED",
-            message: error.message,
-        })
+        res.send({
+            status: "FAILED",
+            message: error.message
+        });
     }
 }
 
@@ -101,9 +89,7 @@ const DeleteMeetingController = async (req, res) => {
 
         await jwt.verify(token, process.env.JWT_KEY, async (err) => {
             if (err) {
-                res.status(401).json({
-                    message: "You don't have the access"
-                })
+                throw new Error("You don't have the access")
             }
             else {
                 await ScheduledEmails.deleteOne({ _id: userId })
@@ -114,9 +100,9 @@ const DeleteMeetingController = async (req, res) => {
             }
         })
     } catch (error) {
-        res.status(401).json({
-            staus: "FAILED",
-            message: error.message,
+        res.send({
+            status: "FAILED",
+            message: error.message
         })
     }
 }
@@ -149,127 +135,85 @@ const SendEmailController = async (req, res) => {
 
         await jwt.verify(token, process.env.JWT_KEY, async (err) => {
             if (err) {
-                res.status(401).json({
-                    status: "FAILED",
-                    message: "You don't have the access"
-                })
+                throw new Error("You don't have the access")
             }
             else {
                 if (startTime.hours > endTime.hours || (startTime.hours === endTime.hours && startTime.minutes > endTime.minutes)) {
-                    res.status(401).json({
-                        status: "FAILED",
-                        message: "Start time must be less than end time"
-                    })
+                    throw new Error("Start time must be less than end time")
                 }
                 else {
 
                     let emailDate = new Date(`${date}T${startTime.hours}:${startTime.minutes}`)
 
                     if (emailDate < new Date()) {
-                        res.status(401).json({
-                            status: "FAILED",
-                            message: "Select date and time must be greater than today's date and time"
-                        })
+                        throw new Error("Select date and time must be greater than today's date and time")
                     }
 
-                    else {
-                        emailDate.setHours(emailDate.getHours() - 5);
-                        emailDate.setMinutes(emailDate.getMinutes() - 30);
+                    emailDate.setHours(emailDate.getHours() - 5);
+                    emailDate.setMinutes(emailDate.getMinutes() - 30);
 
-                        if (reminder === "Before 1 hour of the meeting") {
-                            emailDate.setMinutes(emailDate.getMinutes() + 1);
-                        }
-                        if (reminder === "Before 6 hours of the meeting") {
-                            emailDate.setHours(emailDate.getHours() - 6);
-                        }
-                        if (reminder === "Before 12 hours of the meeting") {
-                            emailDate.setHours(emailDate.getHours() - 12);
-                        }
-                        if (reminder === "Before 1 day of the meeting") {
-                            emailDate.setHours(emailDate.getHours() - 24);
+                    if (reminder === "Before 1 hour of the meeting") {
+                        emailDate.setMinutes(emailDate.getMinutes() + 1);
+                    }
+                    if (reminder === "Before 6 hours of the meeting") {
+                        emailDate.setHours(emailDate.getHours() - 6);
+                    }
+                    if (reminder === "Before 12 hours of the meeting") {
+                        emailDate.setHours(emailDate.getHours() - 12);
+                    }
+                    if (reminder === "Before 1 day of the meeting") {
+                        emailDate.setHours(emailDate.getHours() - 24);
+                    }
+                    else {
+
+                        const response = await MailAccount.find({ email: from, userId })
+
+                        let id = response[0].userId
+                        let password = response[0].password
+
+                        let emailIds = []
+
+                        const result = await List.find({ listName: to, userId: id })
+
+
+                        if (!result.length) {
+                            throw new Error("There is no email")
                         }
                         else {
+                            let id = result[0]._id;
+                            const response = await UserEmail.find({ userId: id })
 
-                            const response = await MailAccount.find({ email: from, userId })
-
-                            let id = response[0].userId
-                            let password = response[0].password
-
-                            let emailIds = []
-
-                            const result = await List.find({ listName: to, userId: id })
-
-
-                            if (!result.length) {
-                                res.status(401).json({
-                                    status: "FAILED",
-                                    message: "There is no email"
-                                })
+                            let i = 0;
+                            response.forEach(function (response) {
+                                emailIds[i] = response.email
+                                i++;
+                            })
+                            if (emailIds.length == 0) {
+                                throw new Error(`No email found inside ${result[0].listName} List`)
                             }
                             else {
-                                let id = result[0]._id;
-                                const response = await UserEmail.find({ userId: id })
 
-                                let i = 0;
-                                response.forEach(function (response) {
-                                    emailIds[i] = response.email
-                                    i++;
-                                })
-                                if (emailIds.length == 0) {
-                                    res.status(401).json({
-                                        status: "FAILED",
-                                        message: `No email found inside ${result[0].listName} List`
+                                if (reminder === "Immediately") {
+
+                                    let newTransporter = nodemailer.createTransport({
+                                        service: 'gmail',
+                                        auth: {
+                                            user: from,
+                                            pass: password
+                                        }
                                     })
-                                }
-                                else {
 
-                                    if (reminder === "Immediately") {
-
-                                        let newTransporter = nodemailer.createTransport({
-                                            service: 'gmail',
-                                            auth: {
-                                                user: from,
-                                                pass: password
-                                            }
-                                        })
-
-                                        const mailOptions = {
-                                            from: from,
-                                            to: emailIds.toString(),
-                                            subject: subject,
-                                            html: `${descriptionPara}
+                                    const mailOptions = {
+                                        from: from,
+                                        to: emailIds.toString(),
+                                        subject: subject,
+                                        html: `${descriptionPara}
                                             <h4>Date: ${date}</h4>
                                             <h4> Time: ${startTime.hours}:${startTime.minutes}-${endTime.hours}:${endTime.minutes}</h4>`
-                                        };
+                                    };
 
-                                        newTransporter.sendMail(mailOptions).then(async () => {
+                                    newTransporter.sendMail(mailOptions).then(async () => {
 
-                                            const newScheduledEmails = new ScheduledEmails({
-                                                userId: userId,
-                                                subject: subject,
-                                                from: from,
-                                                to: emailIds.toString(),
-                                                meetingDate: date,
-                                                startTime: `${startTime.hours}:${startTime.minutes}`,
-                                                endTime: `${endTime.hours}:${endTime.minutes}`,
-                                                scheduleDate: emailDate.toISOString(),
-                                                description: descriptionPara,
-                                                sent: "Yes",
-                                                tag: "Everyone"
-                                            })
-                                            await newScheduledEmails.save()
-                                            res.send({
-                                                status: "SUCCESS",
-                                                message: "Email sent"
-                                            })
-                                        }).catch(() => {
-                                            res.status(401).json({
-                                                staus: "FAILED",
-                                                message: "Email and Password is wrong"
-                                            })
-                                        })
-                                    }
-                                    else {
                                         const newScheduledEmails = new ScheduledEmails({
                                             userId: userId,
                                             subject: subject,
@@ -280,18 +224,43 @@ const SendEmailController = async (req, res) => {
                                             endTime: `${endTime.hours}:${endTime.minutes}`,
                                             scheduleDate: emailDate.toISOString(),
                                             description: descriptionPara,
-                                            sent: "InProcess",
+                                            sent: "Yes",
                                             tag: "Everyone"
                                         })
                                         await newScheduledEmails.save()
-
-                                        await checkEmailEverySecond();
-
                                         res.send({
                                             status: "SUCCESS",
-                                            message: `Email saved in draft. It will automatically send ${reminder}`
+                                            message: "Email sent"
                                         })
-                                    }
+                                    }).catch(() => {
+                                        res.send({
+                                            status: "FAILED",
+                                            message: "Email and Password is wrong"
+                                        })
+                                    })
+                                }
+                                else {
+                                    const newScheduledEmails = new ScheduledEmails({
+                                        userId: userId,
+                                        subject: subject,
+                                        from: from,
+                                        to: emailIds.toString(),
+                                        meetingDate: date,
+                                        startTime: `${startTime.hours}:${startTime.minutes}`,
+                                        endTime: `${endTime.hours}:${endTime.minutes}`,
+                                        scheduleDate: emailDate.toISOString(),
+                                        description: descriptionPara,
+                                        sent: "InProcess",
+                                        tag: "Everyone"
+                                    })
+                                    await newScheduledEmails.save()
+
+                                    await checkEmailEverySecond();
+
+                                    res.send({
+                                        status: "SUCCESS",
+                                        message: `Email saved in draft. It will automatically send ${reminder}`
+                                    })
                                 }
                             }
                         }
@@ -314,6 +283,8 @@ const SendEmailIndividualController = async (req, res) => {
 
         let { subject, from, to, description, startTime, endTime, date, reminder, userId } = req.body
 
+
+
         let textArray = description.split(/^/gm)
 
         let descriptionPara = "";
@@ -335,102 +306,63 @@ const SendEmailIndividualController = async (req, res) => {
 
         await jwt.verify(token, process.env.JWT_KEY, async (err) => {
             if (err) {
-                res.status(401).json({
-                    status: "FAILED",
-                    message: "You don't have the access"
-                })
+                throw new Error("You don't have the access")
             }
             else {
                 if (startTime.hours > endTime.hours || (startTime.hours === endTime.hours && startTime.minutes > endTime.minutes)) {
-                    res.status(401).json({
-                        status: "FAILED",
-                        message: "Start time must be less than end time"
-                    })
+                    throw new Error("Start time must be less than end time")
                 }
                 else {
 
                     let emailDate = new Date(`${date}T${startTime.hours}:${startTime.minutes}`)
 
                     if (emailDate < new Date()) {
-                        res.status(401).json({
-                            status: "FAILED",
-                            message: "Select date and time must be greater than today's date and time"
-                        })
+                        throw new Error("Select date and time must be greater than today's date and time")
                     }
 
+                    emailDate.setHours(emailDate.getHours() - 5);
+                    emailDate.setMinutes(emailDate.getMinutes() - 30);
+
+                    if (reminder === "Before 1 hour of the meeting") {
+                        emailDate.setMinutes(emailDate.getMinutes() + 1);
+                    }
+                    if (reminder === "Before 6 hours of the meeting") {
+                        emailDate.setHours(emailDate.getHours() - 6);
+                    }
+                    if (reminder === "Before 12 hours of the meeting") {
+                        emailDate.setHours(emailDate.getHours() - 12);
+                    }
+                    if (reminder === "Before 1 day of the meeting") {
+                        emailDate.setHours(emailDate.getHours() - 24);
+                    }
                     else {
-                        emailDate.setHours(emailDate.getHours() - 5);
-                        emailDate.setMinutes(emailDate.getMinutes() - 30);
 
-                        if (reminder === "Before 1 hour of the meeting") {
-                            emailDate.setMinutes(emailDate.getMinutes() + 1);
-                        }
-                        if (reminder === "Before 6 hours of the meeting") {
-                            emailDate.setHours(emailDate.getHours() - 6);
-                        }
-                        if (reminder === "Before 12 hours of the meeting") {
-                            emailDate.setHours(emailDate.getHours() - 12);
-                        }
-                        if (reminder === "Before 1 day of the meeting") {
-                            emailDate.setHours(emailDate.getHours() - 24);
-                        }
-                        else {
+                        const response = await MailAccount.find({ email: from, userId })
 
-                            const response = await MailAccount.find({ email: from, userId })
-
-                            let password = response[0].password
+                        let password = response[0].password
 
 
-                            if (reminder === "Immediately") {
+                        if (reminder === "Immediately") {
 
-                                let newTransporter = nodemailer.createTransport({
-                                    service: 'gmail',
-                                    auth: {
-                                        user: from,
-                                        pass: password
-                                    }
-                                })
+                            let newTransporter = nodemailer.createTransport({
+                                service: 'gmail',
+                                auth: {
+                                    user: from,
+                                    pass: password
+                                }
+                            })
 
-                                const mailOptions = {
-                                    from: from,
-                                    to: to,
-                                    subject: subject,
-                                    html: `${descriptionPara}
+                            const mailOptions = {
+                                from: from,
+                                to: to,
+                                subject: subject,
+                                html: `${descriptionPara}
                                     <h4>Date: ${date}</h4>
                                     <h4> Time: ${startTime.hours}:${startTime.minutes}-${endTime.hours}:${endTime.minutes}</h4>`
-                                };
+                            };
 
-                                newTransporter.sendMail(mailOptions).then(async () => {
+                            newTransporter.sendMail(mailOptions).then(async () => {
 
-                                    const newScheduledEmails = new ScheduledEmails({
-                                        userId: userId,
-                                        subject: subject,
-                                        from: from,
-                                        to: to,
-                                        meetingDate: date,
-                                        startTime: `${startTime.hours}:${startTime.minutes}`,
-                                        endTime: `${endTime.hours}:${endTime.minutes}`,
-                                        scheduleDate: emailDate.toISOString(),
-                                        description: descriptionPara,
-                                        sent: "Yes",
-                                        tag: "Individual"
-                                    })
-                                    await newScheduledEmails.save()
-
-                                    await checkEmailEverySecond();
-
-                                    res.send({
-                                        status: "SUCCESS",
-                                        message: "Email sent"
-                                    })
-                                }).catch(() => {
-                                    res.status(401).json({
-                                        staus: "FAILED",
-                                        message: "Email and Password is wrong"
-                                    })
-                                })
-                            }
-                            else {
                                 const newScheduledEmails = new ScheduledEmails({
                                     userId: userId,
                                     subject: subject,
@@ -441,7 +373,7 @@ const SendEmailIndividualController = async (req, res) => {
                                     endTime: `${endTime.hours}:${endTime.minutes}`,
                                     scheduleDate: emailDate.toISOString(),
                                     description: descriptionPara,
-                                    sent: "InProcess",
+                                    sent: "Yes",
                                     tag: "Individual"
                                 })
                                 await newScheduledEmails.save()
@@ -450,19 +382,47 @@ const SendEmailIndividualController = async (req, res) => {
 
                                 res.send({
                                     status: "SUCCESS",
-                                    message: `Email saved in draft. It will automatically send ${reminder}`
+                                    message: "Email sent"
                                 })
-                            }
+                            }).catch(() => {
+                                res.send({
+                                    status: "FAILED",
+                                    message: "Email and Password is wrong"
+                                })
+                            })
+                        }
+                        else {
+                            const newScheduledEmails = new ScheduledEmails({
+                                userId: userId,
+                                subject: subject,
+                                from: from,
+                                to: to,
+                                meetingDate: date,
+                                startTime: `${startTime.hours}:${startTime.minutes}`,
+                                endTime: `${endTime.hours}:${endTime.minutes}`,
+                                scheduleDate: emailDate.toISOString(),
+                                description: descriptionPara,
+                                sent: "InProcess",
+                                tag: "Individual"
+                            })
+                            await newScheduledEmails.save()
+
+                            await checkEmailEverySecond();
+
+                            res.send({
+                                status: "SUCCESS",
+                                message: `Email saved in draft. It will automatically send ${reminder}`
+                            })
                         }
                     }
                 }
             }
         })
     } catch (error) {
-        res.status(401).json({
-            staus: "FAILED",
+        res.send({
+            status: "FAILED",
             message: error.message,
-        })
+        });
     }
 }
 
