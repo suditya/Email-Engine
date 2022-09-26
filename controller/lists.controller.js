@@ -47,7 +47,10 @@ const UsersEmailsController = async (req, res) => {
 
         await jwt.verify(token, process.env.JWT_KEY, async (err) => {
             if (err) {
-                throw new Error("You don't have the access")
+                res.status(401).json({
+                    status: "FAILED",
+                    message: "You don't have the access"
+                })
             }
             else {
                 const result = await UserEmail.find({ userId: req.params['_id'] })
@@ -59,9 +62,9 @@ const UsersEmailsController = async (req, res) => {
             }
         })
     } catch (error) {
-        res.send({
-            status: "FAILED",
-            message: error.message
+        res.status(401).json({
+            staus: "FAILED",
+            message: error.message,
         })
     }
 }
@@ -190,13 +193,19 @@ const DeleteListController = async (req, res) => {
 
         await jwt.verify(token, process.env.JWT_KEY, async (err) => {
             if (err) {
-                throw new Error("You don't have the access")
+                res.status(401).json({
+                    status: "FAILED",
+                    message: "You don't have the access"
+                })
             }
             else {
                 const result = await List.find({ _id: id })
 
                 if (!result.length) {
-                    throw new Error("There is no list with this name")
+                    res.status(401).json({
+                        status: "FAILED",
+                        message: "There is no list with this name"
+                    })
                 }
                 else {
                     await List.deleteOne({ _id: id })
@@ -214,9 +223,9 @@ const DeleteListController = async (req, res) => {
 
     }
     catch (error) {
-        res.send({
-            status: "FAILED",
-            message: error.message
+        res.status(401).json({
+            staus: "FAILED",
+            message: error.message,
         })
     }
 }
@@ -229,13 +238,19 @@ const DeleteUserController = async (req, res) => {
 
         await jwt.verify(token, process.env.JWT_KEY, async (err) => {
             if (err) {
-                throw new Error("You don't have the access")
+                res.status(401).json({
+                    status: "FAILED",
+                    message: "You don't have the access"
+                })
             }
             else {
                 const result = await UserEmail.find({ _id: id })
 
                 if (result.length == 0) {
-                    throw new Error("There is no member with this email")
+                    res.status(401).json({
+                        status: "FAILED",
+                        message: "There is no member with this email"
+                    })
                 }
                 else {
                     await UserEmail.deleteOne({ _id: id })
@@ -250,9 +265,9 @@ const DeleteUserController = async (req, res) => {
 
 
     } catch (error) {
-        res.send({
-            status: "FAILED",
-            message: error.message
+        res.status(401).json({
+            staus: "FAILED",
+            message: error.message,
         })
     }
 }
