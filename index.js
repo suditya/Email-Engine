@@ -19,13 +19,13 @@ const UserRouter = require('./api/User');
 const VerificationRouter = require('./api/Verification');
 const AccountRouter = require('./api/Account');
 const ListRouter = require('./api/List');
-const ScheduledEmail = require('./api/ScheduledEmail');
+const ScheduledEmailRouter = require('./api/ScheduledEmail');
 
 app.use('/api/user', UserRouter)
 app.use('/api/verification', VerificationRouter)
 app.use('/api/account', AccountRouter)
 app.use('/api/list', ListRouter)
-app.use('/api/email', ScheduledEmail)
+app.use('/api/email', ScheduledEmailRouter)
 
 
 app.use(function (req, res, next) {

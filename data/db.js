@@ -9,7 +9,6 @@ mongoose.connect(connectionStr, {
     useNewUrlParser: true,
 });
 
-
 mongoose.connection.on('error', error => {
     console.error(`could not connect to database ${DB_NAME}, error = `, error.message)
     process.exit(1);

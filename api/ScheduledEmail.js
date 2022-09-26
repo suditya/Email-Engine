@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 
-const { ScheduledEmailsController, ScheduledIndividualEmailsController, SendEmailController, SendEmailIndividualController, DeleteMeetingController } = require('../controller/ScheduledEmailsController')
+const { ScheduledEmailsController, ScheduledIndividualEmailsController, SendEmailController, SendEmailIndividualController, DeleteMeetingController } = require('../controller/scheduledEmailsController')
 
 
 router.get('/ScheduledEmails/:userId', (req, res) => {
