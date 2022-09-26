@@ -42,7 +42,8 @@ const SendOTPVerificationEmail = async ({ _id, email }, res) => {
 
         await newOTPVerification.save();
         await transporter.sendMail(mailOptions);
-        res.send({
+
+        res.status(202).send({
             status: "PENDING",
             message: `Verification OTP email sent to ${email}`,
             data: {
@@ -52,7 +53,7 @@ const SendOTPVerificationEmail = async ({ _id, email }, res) => {
         })
 
     } catch (error) {
-        res.send({
+        res.status(401).json({
             status: "FAILED",
             message: error.message
         })
@@ -67,10 +68,14 @@ const ReSendOTPController = async (req, res) => {
         const result = await User.find({ email }, { verified: 1 })
 
         if (result.length == 0) {
-            throw new Error("User doesn't exist. Please signup first !")
+            res.status(401).json({
+                message: "User doesn't exist. Please signup first !"
+            })
         }
         else if (result[0].verified === true) {
-            throw new Error("Email id has been already verified !")
+            res.status(401).json({
+                message: "Email id has been already verified !"
+            })
         }
         else {
             const _id = result[0]._id;
@@ -78,9 +83,9 @@ const ReSendOTPController = async (req, res) => {
             await SendOTPVerificationEmail({ _id, email }, res)
         }
     } catch (error) {
-        res.send({
-            status: "FAILED",
-            message: error.message
+        res.status(401).json({
+            staus: "FAILED",
+            message: error.message,
         })
     }
 }
@@ -90,43 +95,63 @@ const VerifyOtpController = async (req, res) => {
     try {
         let { userId, otp } = req.body
 
+        console.log(userId, otp);
+
         if (!userId || !otp) {
-            throw new Error("Empty otp details are not allowed")
+            res.status(401).json({
+                message: "Empty otp details are not allowed"
+            })
         }
+        else {
+            const result = await UserOTPVerification.findOne({ userId })
+            console.log("result", result);
 
-        const result = await UserOTPVerification.find({ userId })
+            if (result.length <= 0) {
+                res.status(401).json({
+                    message: "Account record doesn't exist or has been already verified"
+                })
+            }
 
-        if (result.length <= 0) {
-            throw new Error("Account record doesn't exist or has been already verified.")
+            else {
+                const { expiresAt } = result;
+                const hashedOTP = result.otp;
+
+                if (expiresAt < Date.now()) {
+                    UserOTPVerification.deleteMany({ userId });
+
+                    res.status(401).json({
+                        status: "FAILED",
+                        message: "Code has expired. Please request again"
+                    })
+                }
+
+                else {
+                    const response = await bcrypt.compare(otp, hashedOTP);
+
+                    if (!response) {
+                        res.status(401).json({
+                            staus: "FAILED",
+                            message: "Invalid OTP"
+                        })
+                    }
+
+                    else {
+                        await User.updateOne({ _id: userId }, { verified: true })
+                        await UserOTPVerification.deleteMany({ userId })
+
+                        res.send({
+                            status: "VERIFIED",
+                            message: "User email verified successfully."
+                        })
+                    }
+                }
+            }
         }
-
-        const { expiresAt } = result[0];
-        const hashedOTP = result[0].otp;
-
-        if (expiresAt < Date.now()) {
-            UserOTPVerification.deleteMany({ userId });
-            throw new Error("Code has expired. Please request again");
-        }
-
-        const response = await bcrypt.compare(otp, hashedOTP);
-
-        if (!response) {
-            throw new Error("Invalid OTP")
-        }
-
-        await User.updateOne({ _id: userId }, { verified: true })
-        await UserOTPVerification.deleteMany({ userId })
-
-        res.send({
-            status: "VERIFIED",
-            message: "User email verified successfully."
-        })
-
     } catch (error) {
-        res.send({
+        res.status(401).json({
             staus: "FAILED",
             message: error.message,
-        });
+        })
     }
 }
 

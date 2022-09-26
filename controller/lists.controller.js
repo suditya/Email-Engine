@@ -9,15 +9,19 @@ const AllListsController = async (req, res) => {
     try {
         let token = req.headers['authorization']
 
-        await jwt.verify(token, process.env.JWT_KEY, async(err) => {
-            if(err) {
-                throw new Error("You don't have the access")
+        await jwt.verify(token, process.env.JWT_KEY, async (err) => {
+            if (err) {
+                res.status(401).json({
+                    message: "You don't have the access"
+                })
             }
             else {
                 const data = await List.find({ userId: req.params['userId'] })
-    
+
                 if (data.length == 0) {
-                    throw new Error("No List is there")
+                    res.status(401).json({
+                        message: "No List is there"
+                    })
                 }
                 else {
                     res.send({
@@ -27,11 +31,11 @@ const AllListsController = async (req, res) => {
                 }
             }
         })
-        
+
     } catch (error) {
-        res.send({
-            status: "FAILED",
-            message: error.message
+        res.status(401).json({
+            staus: "FAILED",
+            message: error.message,
         })
     }
 }
@@ -41,13 +45,16 @@ const UsersEmailsController = async (req, res) => {
     try {
         let token = req.headers['authorization']
 
-        await jwt.verify(token, process.env.JWT_KEY, async(err) => {
+        await jwt.verify(token, process.env.JWT_KEY, async (err) => {
             if (err) {
-                throw new Error("You don't have the access")
+                res.status(401).json({
+                    status: "FAILED",
+                    message: "You don't have the access"
+                })
             }
             else {
                 const result = await UserEmail.find({ userId: req.params['_id'] })
-    
+
                 res.send({
                     status: "SUCCESS",
                     data: result
@@ -55,9 +62,9 @@ const UsersEmailsController = async (req, res) => {
             }
         })
     } catch (error) {
-        res.send({
-            status: "FAILED",
-            message: error.message
+        res.status(401).json({
+            staus: "FAILED",
+            message: error.message,
         })
     }
 }
@@ -69,23 +76,32 @@ const AddUserController = async (req, res) => {
 
         let token = req.headers['authorization']
 
-        await jwt.verify(token, process.env.JWT_KEY, async(err) => {
+        await jwt.verify(token, process.env.JWT_KEY, async (err) => {
             if (err) {
-                throw new Error("You don't have the access")
+                res.status(401).json({
+                    status: "FAILED",
+                    message: "You don't have the access"
+                })
             }
             else {
                 const result = await List.find({ listName, userId })
-    
+
                 let _id = result[0]._id
-    
+
                 if (!result.length) {
-                    throw new Error("You don't have any list. Please add a list first")
+                    res.status(401).json({
+                        status: "FAILED",
+                        message: "You don't have any list. Please add a list first"
+                    })
                 }
                 else {
                     const result = await UserEmail.find({ userId: _id, email })
-    
+
                     if (result.length) {
-                        throw new Error(`Email is already exist inside the ${listName} list`)
+                        res.status(401).json({
+                            status: "FAILED",
+                            message: `Email is already exist inside the ${listName} list`
+                        })
                     }
                     else {
                         const newUserEmail = new UserEmail({
@@ -94,9 +110,9 @@ const AddUserController = async (req, res) => {
                             email: email,
                             listName: listName
                         })
-    
+
                         await newUserEmail.save();
-    
+
                         res.send({
                             status: "SUCCESS",
                             message: "User email has been added successfully"
@@ -106,9 +122,9 @@ const AddUserController = async (req, res) => {
             }
         })
     } catch (error) {
-        res.send({
-            status: "FAILED",
-            message: error.message
+        res.status(401).json({
+            staus: "FAILED",
+            message: error.message,
         })
     }
 }
@@ -119,21 +135,29 @@ const AddListController = async (req, res) => {
 
         let token = req.headers['authorization']
 
-        await jwt.verify(token, process.env.JWT_KEY, async(err) => {
+        await jwt.verify(token, process.env.JWT_KEY, async (err) => {
             if (err) {
-                throw new Error("You don't have the access")
+                res.status(401).json({
+                    message: "You don't have the access"
+                })
             }
             else {
                 const result = await MailAccount.find({ userId })
-    
+
                 if (result.length == 0) {
-                    throw new Error("OOPS, You don't have any account. Please add an account first")
+                    res.status(401).json({
+                        status: "FAILED",
+                        message: "OOPS, You don't have any account. Please add an account first"
+                    })
                 }
                 else {
                     const result = await List.find({ userId, listName })
-    
+
                     if (result.length) {
-                        throw new Error("List name is already there. Please try with different list name")
+                        res.status(401).json({
+                            status: "FAILED",
+                            message: "List name is already there. Please try with different list name"
+                        })
                     }
                     else {
                         const newList = new List({
@@ -141,9 +165,9 @@ const AddListController = async (req, res) => {
                             listName: listName,
                             description: description
                         })
-    
+
                         await newList.save();
-    
+
                         res.send({
                             status: "SUCCESS",
                             message: "List added successfully."
@@ -153,9 +177,9 @@ const AddListController = async (req, res) => {
             }
         })
     } catch (error) {
-        res.send({
-            status: "FAILED",
-            message: error.message
+        res.status(401).json({
+            staus: "FAILED",
+            message: error.message,
         })
     }
 }
@@ -167,21 +191,27 @@ const DeleteListController = async (req, res) => {
 
         let token = req.headers['authorization']
 
-        await jwt.verify(token, process.env.JWT_KEY, async(err) => {
+        await jwt.verify(token, process.env.JWT_KEY, async (err) => {
             if (err) {
-                throw new Error("You don't have the access")
+                res.status(401).json({
+                    status: "FAILED",
+                    message: "You don't have the access"
+                })
             }
             else {
                 const result = await List.find({ _id: id })
-    
+
                 if (!result.length) {
-                    throw new Error("There is no list with this name")
+                    res.status(401).json({
+                        status: "FAILED",
+                        message: "There is no list with this name"
+                    })
                 }
                 else {
                     await List.deleteOne({ _id: id })
                     await UserEmail.find({ userId: id })
                     await UserEmail.deleteMany({ userId: id });
-    
+
                     res.send({
                         status: "SUCCESS",
                         message: "List has been deleted"
@@ -190,12 +220,12 @@ const DeleteListController = async (req, res) => {
             }
         })
 
-        
+
     }
     catch (error) {
-        res.send({
-            status: "FAILED",
-            message: error.message
+        res.status(401).json({
+            staus: "FAILED",
+            message: error.message,
         })
     }
 }
@@ -206,19 +236,25 @@ const DeleteUserController = async (req, res) => {
 
         let token = req.headers['authorization']
 
-        await jwt.verify(token, process.env.JWT_KEY, async(err) => {
+        await jwt.verify(token, process.env.JWT_KEY, async (err) => {
             if (err) {
-                throw new Error("You don't have the access")
+                res.status(401).json({
+                    status: "FAILED",
+                    message: "You don't have the access"
+                })
             }
             else {
                 const result = await UserEmail.find({ _id: id })
-    
+
                 if (result.length == 0) {
-                    throw new Error("There is no member with this email")
+                    res.status(401).json({
+                        status: "FAILED",
+                        message: "There is no member with this email"
+                    })
                 }
                 else {
                     await UserEmail.deleteOne({ _id: id })
-    
+
                     res.send({
                         status: "SUCCESS",
                         message: "Member has been deleted"
@@ -227,11 +263,11 @@ const DeleteUserController = async (req, res) => {
             }
         })
 
-        
+
     } catch (error) {
-        res.send({
-            status: "FAILED",
-            message: error.message
+        res.status(401).json({
+            staus: "FAILED",
+            message: error.message,
         })
     }
 }
