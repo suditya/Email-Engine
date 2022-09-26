@@ -13,10 +13,7 @@ const SignupController = async (req, res) => {
         const result = await User.find({ email })
 
         if (result.length) {
-            res.status(401).json({
-                status: "SUCCESS",
-                message: "User with this email id is already exist"
-            })
+            throw new Error("User with this email id is already exist")
         }
         else {
             const saltRounds = 10
@@ -33,7 +30,7 @@ const SignupController = async (req, res) => {
             await SendOTPVerificationEmail(newUser, res);
         }
     } catch (error) {
-        res.status(401).json({
+        res.send({
             status: "FAILED",
             message: error.message
         })
@@ -45,53 +42,41 @@ const SigninController = async (req, res) => {
     try {
         let { email, password } = req.body;
 
-        if (!(email && password)) {
-            res.status(401).json({
-                message: "Empty details are not allowed"
-            })
+        const data = await User.find({ email })
+
+        if (data.length == 0) {
+            throw new Error("Email i'd doesn't exist. Please Register first")
         }
-
+        else if (!data[0].verified) {
+            throw new Error("Email has not been verified yet")
+        }
         else {
-            const data = await User.findOne({ email })
+            const hashedPassword = data[0].password;
+            const result = await bcrypt.compare(password, hashedPassword);
 
-            if (data.length == 0) {
-                res.status(401).json({
-                    message: "Email i'd doesn't exist. Please Register first"
-                })
-            }
-            else if (!data.verified) {
-                res.status(401).json({
-                    message: "Email has not been verified yet"
+            if (result) {
+                const claims = {
+                    email: email
+                }
+
+                const token = await jwt.sign(claims, process.env.JWT_KEY)
+
+                res.send({
+                    status: "SUCCESS",
+                    message: "Singin Successful",
+                    authToken: token,
+                    data: data,
+                    email: data[0].email,
+                    userId: data[0]._id
                 })
             }
             else {
-                const hashedPassword = data.password;
-                const result = await bcrypt.compare(password, hashedPassword);
-
-                if (result) {
-                    const claims = {
-                        email: email
-                    }
-
-                    const token = await jwt.sign(claims, process.env.JWT_KEY)
-
-                    res.send({
-                        message: "Singin Successful",
-                        authToken: token,
-                        email: data.email,
-                        userId: data._id
-                    })
-                }
-                else {
-                    res.status(401).json({
-                        message: "Invalid credentials entered"
-                    })
-                }
+                throw new Error("Invalid credentials entered")
             }
         }
     } catch (error) {
-        res.status(401).json({
-            staus: "FAILED",
+        res.send({
+            status: "FAILED",
             message: error.message
         })
     }

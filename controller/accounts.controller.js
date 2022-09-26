@@ -8,17 +8,13 @@ const MailAccountsController = async (req, res) => {
 
         await jwt.verify(token, process.env.JWT_KEY, async (err) => {
             if (err) {
-                res.status(401).json({
-                    message: "You don't have the access"
-                })
+                throw new Error("You don't have the access")
             }
             else {
                 const data = await MailAccount.find({ userId: req.params['userId'] })
 
                 if (data.length == 0) {
-                    res.status(401).json({
-                        message: "No account is there"
-                    })
+                    throw new Error("No account is there")
                 }
                 else {
                     res.send({
@@ -29,9 +25,9 @@ const MailAccountsController = async (req, res) => {
             }
         })
     } catch (error) {
-        res.status(401).json({
-            staus: "FAILED",
-            message: error.message,
+        res.send({
+            status: "FAILED",
+            message: error.message
         })
     }
 }
@@ -45,17 +41,13 @@ const AddAccountController = async (req, res) => {
 
         await jwt.verify(token, process.env.JWT_KEY, async (err) => {
             if (err) {
-                res.status(401).json({
-                    message: "You don't have the access"
-                })
+                throw new Error("You don't have the access")
             }
             else {
                 const result = await MailAccount.find({ email, userId })
 
                 if (result.length) {
-                    res.status(401).json({
-                        message: "Account with this email id is already exist"
-                    })
+                    throw new Error("User with this email id is already exist")
                 }
                 else {
                     const newAddAccount = new MailAccount({
@@ -74,8 +66,9 @@ const AddAccountController = async (req, res) => {
                 }
             }
         })
+
     } catch (error) {
-        res.status(401).json({
+        res.send({
             status: "FAILED",
             message: error.message
         })
@@ -91,9 +84,7 @@ const DeleteAccountController = async (req, res) => {
 
         await jwt.verify(token, process.env.JWT_KEY, async (err) => {
             if (err) {
-                res.status(401).json({
-                    message: "You don't have the access"
-                })
+                throw new Error("You don't have the access")
             }
             else {
                 await MailAccount.deleteOne({ _id: id })
@@ -105,7 +96,7 @@ const DeleteAccountController = async (req, res) => {
             }
         })
     } catch (error) {
-        res.status(401).json({
+        res.send({
             status: "FAILED",
             message: error.message
         })
